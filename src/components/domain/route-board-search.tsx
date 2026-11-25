@@ -36,7 +36,7 @@ function ReadoutLine({ value, muted }: { value: string; muted?: boolean }) {
 export function RouteBoardSearch({ className }: { className?: string }) {
   const id = useId();
   const [area, setArea] = useState("");
-  const [county, setCounty] = useState("Nairobi");
+  const [county, setCounty] = useState("");
   const [type, setType] = useState<PropertyType | "">("");
   const [maxPrice, setMaxPrice] = useState("");
 
@@ -76,8 +76,8 @@ export function RouteBoardSearch({ className }: { className?: string }) {
         </p>
       </div>
 
-      <div className="grid gap-4 p-4 sm:px-6 sm:pb-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto] lg:items-end">
-        <div className="grid gap-1.5">
+      <div className="grid grid-cols-2 gap-3 p-4 sm:gap-4 sm:px-6 sm:pb-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto] lg:items-end">
+        <div className="col-span-2 grid gap-1.5 lg:col-span-1">
           <label htmlFor={`${id}-area`} className="text-step--1 font-bold text-on-board-2">
             Area, estate or campus
           </label>
@@ -131,7 +131,7 @@ export function RouteBoardSearch({ className }: { className?: string }) {
             ))}
           </select>
         </div>
-        <div className="grid gap-1.5">
+        <div className="col-span-2 grid gap-1.5 lg:col-span-1">
           <label htmlFor={`${id}-budget`} className="text-step--1 font-bold text-on-board-2">
             Budget a month
           </label>
@@ -150,7 +150,12 @@ export function RouteBoardSearch({ className }: { className?: string }) {
             ))}
           </select>
         </div>
-        <Button type="submit" variant="band" size="lg" className="min-h-12 w-full lg:w-auto">
+        <Button
+          type="submit"
+          variant="band"
+          size="lg"
+          className="col-span-2 min-h-12 w-full lg:col-span-1 lg:w-auto"
+        >
           Show places
           <ArrowRight aria-hidden />
         </Button>

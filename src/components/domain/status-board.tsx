@@ -49,9 +49,7 @@ function Row({ row }: { row: BoardRow }) {
 export function StatusBoard({ title, rows }: { title: string; rows: BoardRow[] }) {
   return (
     <section aria-label={title} className="on-board overflow-hidden rounded-md bg-board text-on-board">
-      <h2 className="board-type-wide border-b border-board-line px-4 py-2.5 text-step--1 text-band">
-        {title}
-      </h2>
+      <h2 className="board-type-wide border-b border-board-line px-4 py-3 text-step--1 text-band">{title}</h2>
       <ul className="divide-y divide-board-line">
         {rows.map((row) => (
           <Row key={row.label} row={row} />

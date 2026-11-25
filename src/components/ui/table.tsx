@@ -27,7 +27,7 @@ export function TH({ className, ...props }: ComponentProps<"th">) {
     <th
       scope="col"
       className={cn(
-        "board-type-wide px-3 py-2.5 text-[0.75rem] font-bold whitespace-nowrap text-on-board-2",
+        "board-type-wide px-3 py-2 text-[0.75rem] font-bold whitespace-nowrap text-on-board-2",
         className,
       )}
       {...props}
@@ -45,5 +45,5 @@ export function TR({ className, ...props }: ComponentProps<"tr">) {
 }
 
 export function TD({ className, ...props }: ComponentProps<"td">) {
-  return <td className={cn("px-3 py-2.5", className)} {...props} />;
+  return <td className={cn("px-3 py-2", className)} {...props} />;
 }

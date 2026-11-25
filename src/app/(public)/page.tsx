@@ -111,7 +111,7 @@ export default function LandingPage() {
   return (
     <>
       {/* First viewport: the promise, then the route board you can use. */}
-      <section aria-labelledby="hero-title" className="wrap grid gap-6 pt-8 pb-10 md:gap-8 md:pt-14 md:pb-14">
+      <section aria-labelledby="hero-title" className="wrap grid gap-5 pt-6 pb-10 md:gap-8 md:pt-14 md:pb-14">
         <div className="grid gap-4">
           <h1 id="hero-title" className="board-type text-step-6">
             Tafuta keja yako.
@@ -125,7 +125,7 @@ export default function LandingPage() {
       </section>
 
       <div className="bg-band text-on-band">
-        <p className="wrap flex items-center gap-3 py-3.5 font-bold">
+        <p className="wrap flex items-center gap-3 py-4 font-bold">
           <ShieldCheck aria-hidden className="size-5 shrink-0" />
           Pay only after you&apos;ve viewed the house. Never send money to &ldquo;hold&rdquo; a place.
         </p>
@@ -244,7 +244,7 @@ export default function LandingPage() {
                 "Meet at the house, in daylight, and take a friend if you can.",
                 "Get a written receipt or agreement for every payment.",
               ].map((tip) => (
-                <li key={tip} className="flex gap-2.5">
+                <li key={tip} className="flex gap-3">
                   <CircleCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-success" />
                   {tip}
                 </li>

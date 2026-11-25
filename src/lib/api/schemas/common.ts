@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// The CSP forbids eval; tell Zod not to probe for it (its JIT check calls Function("")).
+z.config({ jitless: true });
+
 /** ISO-8601 timestamp as the API sends it (UTC, `Z`). Kept as a string; formatted at the edge. */
 export const timestamp = z.iso.datetime({ offset: true });
 /** YYYY-MM-DD, a Kenyan calendar date. */

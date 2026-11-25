@@ -135,3 +135,50 @@ contain "test" (`kejalink_e2e_test`), with every env var set explicitly so nothi
 `backend/.env`. It injects a fake image host via the backend's own `setImageStorage` seam; the fake
 returns Cloudinary's public demo images, so the frontend's loader is exercised for real. The local
 dev server points at it through a gitignored `.env.local`, so local writes never reach production.
+
+## F-14 Fresh availability beats cache
+
+Public listing reads are cached for 30 s at most. Two safeguards keep availability accurate:
+
+- The proxy calls `revalidateTag("properties", { expire: 0 })` after any successful write to
+  `/api/properties`, `/api/bookings` or `/api/admin/(properties|users)`.
+- The booking panel re-checks the listing live on mount.
+
+`"use cache"` storage is per instance on serverless, so the live check is the one that guarantees
+a taken place never offers a request button.
+
+## F-15 Not-found is a value, not an exception, across the cache boundary
+
+Errors thrown inside a `"use cache"` function are serialised and lose their class. `instanceof
+ApiError` then fails, and a removed listing showed "didn't load" instead of the 404.
+`getPublicProperty` therefore returns `null` for 404/422 and throws only for real failures, which
+are never cached.
+
+## F-16 Streaming pages answer 200 for a missing listing
+
+Under Cache Components the listing page streams its shell before the data arrives. A missing
+listing renders the designed 404 with `noindex` after a 200 status line; Next's documented
+behaviour. Unknown routes (no matching segment) still return a real 404.
+
+## F-17 Forms are inert until hydrated
+
+Login, register and the listing form keep their submit button disabled until React hydrates, and
+use `method="post"`. A native submit before hydration would otherwise send a GET with the password
+in the URL, and React Hook Form ignores values typed before hydration anyway.
+
+## F-18 Admin "suspend vs ban"
+
+The API treats SUSPENDED and BANNED the same way: sign-in is blocked and every session is revoked.
+The UI presents suspend as temporary and ban as being for fraud or abuse, and lets both be
+reactivated. A "ban is permanent" claim would not be true, so the UI does not make it.
+
+## F-19 Status labels
+
+The API says REJECTED for both bookings and listings. People read "Declined" for an answered
+request and "Taken down" for a moderated listing; the codes are unchanged.
+
+## F-20 Uploads go through the proxy (Vercel's 4.5 MB body cap)
+
+Photos are resized in the browser to a 1600 px long edge and re-encoded as WebP, or JPEG where
+WebP encoding isn't available. Quality steps down from 0.82 until the photo is under 3.5 MB. EXIF
+orientation is applied. A 1 MB+ camera-size JPEG is uploaded in e2e to prove it.

@@ -147,7 +147,7 @@ export function BookingDetail({
         <aside className="grid content-start gap-5">
           <article className="relative overflow-hidden rounded-md border border-line bg-surface-2">
             <PhotoFrame src={b.property.primaryImageUrl} alt="" sizes="352px" />
-            <div className="on-board bg-board px-4 py-2.5 text-on-board">
+            <div className="on-board bg-board px-4 py-3 text-on-board">
               <p className="board-type text-step-2">{b.property.area}</p>
             </div>
             <div className="grid gap-2 p-4">

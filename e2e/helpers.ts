@@ -106,8 +106,11 @@ export const ADMIN = {
 
 /** The request form on a listing: the side panel on desktop, the bottom sheet on phones. */
 export async function openRequestForm(page: Page) {
-  // The listing streams in; wait for it before deciding which layout is showing.
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 60_000 });
+  // The listing streams in, and returning from sign-in may restore the page with its sheet
+  // still open (route Activity): wait for either before deciding which layout is showing.
+  const open = page.getByRole("dialog");
+  await expect(open.or(page.getByRole("heading", { level: 1 })).first()).toBeVisible({ timeout: 60_000 });
+  if (await open.isVisible()) return open;
   const panel = page.locator("section", { has: page.getByRole("heading", { name: "Request a viewing" }) });
   if (await panel.isVisible()) return panel;
   await page.getByRole("button", { name: "Request a viewing" }).last().click();

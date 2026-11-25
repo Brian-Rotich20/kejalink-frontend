@@ -15,7 +15,7 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
 }
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
-  return <textarea className={cn(control, "min-h-28 py-2.5 leading-relaxed", className)} {...props} />;
+  return <textarea className={cn(control, "min-h-28 py-3 leading-relaxed", className)} {...props} />;
 }
 
 export function NativeSelect({ className, children, ...props }: ComponentProps<"select">) {

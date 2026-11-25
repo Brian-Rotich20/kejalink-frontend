@@ -12,6 +12,7 @@ import {
 
 test.describe("listing, requesting, answering", () => {
   test("a lister creates a listing and uploads a photo from the phone", async ({ page, baseURL }) => {
+    test.slow(); // compresses a camera-size photo in the browser, then uploads it
     const lister = account("TENANT");
     await apiAs(baseURL!, lister);
     await loginUi(page, lister.email);

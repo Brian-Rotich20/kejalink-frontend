@@ -103,7 +103,7 @@ export function PropertyPlate({
         <PhotoFrame src={property.primaryImageUrl} alt="" sizes={sizes} priority={priority} />
         <AvailabilityPlate available={property.isAvailable} className="absolute top-3 left-3" />
       </div>
-      <div className="on-board flex items-baseline justify-between gap-3 bg-board px-4 py-2.5 text-on-board">
+      <div className="on-board flex items-baseline justify-between gap-3 bg-board px-4 py-3 text-on-board">
         <p className="board-type min-w-0 truncate text-step-2">{property.area}</p>
         <p className="shrink-0 text-step--1 text-on-board-2">{property.county}</p>
       </div>
@@ -147,7 +147,7 @@ export function PropertyPlateSkeleton() {
     <div aria-hidden className="overflow-hidden rounded-md border border-line bg-surface-2">
       <div className="aspect-[4/3] animate-[skeleton_1.6s_var(--ease-in-out)_infinite] bg-surface-sunk motion-reduce:animate-none" />
       <div className="h-11 bg-board/85" />
-      <div className="grid gap-2.5 px-4 pt-3 pb-4">
+      <div className="grid gap-3 px-4 pt-3 pb-4">
         <div className="h-7 w-1/2 rounded-sm bg-surface-sunk" />
         <div className="h-5 w-4/5 rounded-sm bg-surface-sunk" />
         <div className="h-4 w-2/5 rounded-sm bg-surface-sunk" />

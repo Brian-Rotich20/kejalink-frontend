@@ -40,7 +40,7 @@ export function RequestCard({
           />
         ) : null}
       </div>
-      <div className="grid min-w-0 gap-2.5">
+      <div className="grid min-w-0 gap-3">
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
           <div className="grid min-w-0 gap-0.5">
             <p className="board-type truncate text-step-2">{booking.property.area}</p>
@@ -81,7 +81,7 @@ export function RequestCard({
           </div>
         </dl>
         {perspective !== "seeker" ? (
-          <div className="flex items-center gap-2.5 text-step--1">
+          <div className="flex items-center gap-3 text-step--1">
             <Avatar name={other.name} size="sm" />
             <span>
               <strong>{other.name}</strong>
