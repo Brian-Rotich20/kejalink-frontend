@@ -14,10 +14,13 @@ export default defineConfig({
     ],
   },
   test: {
-    environment: "jsdom",
+    // Pure modules run in node (fast); component tests opt in with `// @vitest-environment jsdom`.
+    environment: "node",
     setupFiles: ["./tests/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}", "tests/**/*.test.{ts,tsx}"],
     env: { TZ: "Africa/Nairobi" },
     restoreMocks: true,
+    pool: "threads",
+    maxWorkers: 2,
   },
 });

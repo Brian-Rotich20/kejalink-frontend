@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { isApiError, isRetryable } from "./errors";
 
 /** Backoff for GETs: ~0.8 s then ~2.4 s (with jitter), enough to ride out a Render cold start. */
@@ -7,13 +7,32 @@ export const retryDelay = (attempt: number): number =>
 
 export const MAX_GET_RETRIES = 2;
 
-export function makeQueryClient() {
+export const shouldRetryQuery = (failureCount: number, error: unknown): boolean =>
+  failureCount < MAX_GET_RETRIES && isRetryable(error);
+
+export type SessionProblem = "signed-out" | "suspended";
+
+/** 401 anywhere means the session is gone; ACCOUNT_SUSPENDED means it was cut off. */
+export function sessionProblem(error: unknown): SessionProblem | null {
+  if (!isApiError(error)) return null;
+  if (error.code === "ACCOUNT_SUSPENDED") return "suspended";
+  if (error.status === 401) return "signed-out";
+  return null;
+}
+
+export function makeQueryClient(onSessionProblem?: (problem: SessionProblem) => void) {
+  const report = (error: unknown) => {
+    const problem = sessionProblem(error);
+    if (problem && onSessionProblem) onSessionProblem(problem);
+  };
   return new QueryClient({
+    queryCache: new QueryCache({ onError: report }),
+    mutationCache: new MutationCache({ onError: report }),
     defaultOptions: {
       queries: {
         staleTime: 30_000,
         refetchOnWindowFocus: true,
-        retry: (failureCount, error) => failureCount < MAX_GET_RETRIES && isRetryable(error),
+        retry: shouldRetryQuery,
         retryDelay,
       },
       mutations: {
@@ -23,6 +42,3 @@ export function makeQueryClient() {
     },
   });
 }
-
-/** 401 anywhere means the session is gone. */
-export const isUnauthorized = (error: unknown): boolean => isApiError(error) && error.status === 401;
