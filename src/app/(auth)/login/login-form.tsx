@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { FormAlert } from "@/components/domain/form-alert";
 import { PasswordInput } from "@/components/domain/password-input";
 import { Button } from "@/components/ui/button";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { Field, Input } from "@/components/ui/field";
 import { type ApiError, fromAuthError } from "@/lib/api/errors";
 import { authClient, useSession } from "@/lib/auth/client";
@@ -31,6 +32,8 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
   const { errors, isSubmitting } = form.formState;
+  // Until React hydrates, a native submit would GET the password into the URL; keep the button inert.
+  const hydrated = useHydrated();
 
   async function onSubmit(values: SignInValues) {
     setError(null);
@@ -80,7 +83,7 @@ export function LoginForm() {
   }
 
   return (
-    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
+    <form noValidate method="post" onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
       {error ? (
         <FormAlert>
           <p>{error.message}</p>
@@ -113,7 +116,7 @@ export function LoginForm() {
           />
         )}
       </Field>
-      <Button type="submit" variant="band" size="lg" block loading={isSubmitting}>
+      <Button type="submit" variant="band" size="lg" block loading={isSubmitting} disabled={!hydrated}>
         {isSubmitting ? "Signing in" : "Sign in"}
       </Button>
       <div className="grid gap-2 text-step--1 text-ink-2">

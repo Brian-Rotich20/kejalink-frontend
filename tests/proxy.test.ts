@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { buildUpstreamHeaders, clientIp, forward } from "@/lib/proxy/forward";
+import { affectsListings, buildUpstreamHeaders, clientIp, forward } from "@/lib/proxy/forward";
 
 type Seen = { method: string; url: string; headers: IncomingMessage["headers"]; body: Buffer };
 
@@ -168,5 +168,15 @@ describe("API proxy", () => {
     expect(clientIp(new Headers({ "x-real-ip": "1.2.3.4" }))).toBe("1.2.3.4");
     expect(clientIp(new Headers({ "x-forwarded-for": "5.6.7.8, 9.9.9.9" }))).toBe("5.6.7.8");
     expect(clientIp(new Headers())).toBeNull();
+  });
+
+  it("knows which writes must expire cached listing pages", () => {
+    expect(affectsListings("PATCH", "/api/bookings/abc/confirm")).toBe(true);
+    expect(affectsListings("POST", "/api/properties/abc/uploads")).toBe(true);
+    expect(affectsListings("PATCH", "/api/admin/properties/abc/reject")).toBe(true);
+    expect(affectsListings("PATCH", "/api/admin/users/u1")).toBe(true);
+    expect(affectsListings("GET", "/api/properties")).toBe(false);
+    expect(affectsListings("POST", "/api/auth/sign-in/email")).toBe(false);
+    expect(affectsListings("PATCH", "/api/users/me")).toBe(false);
   });
 });

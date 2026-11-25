@@ -31,7 +31,7 @@ export async function searchListings(filters: Filters) {
 export async function getPublicProperty(id: string) {
   "use cache";
   cacheLife(LISTING_LIFE);
-  cacheTag(`property:${id}`);
+  cacheTag("properties", `property:${id}`);
   return publicGet(`/properties/${encodeURIComponent(id)}`, propertyDetail);
 }
 

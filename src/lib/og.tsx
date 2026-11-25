@@ -2,11 +2,11 @@ import type { ReactNode } from "react";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG = {
-  board: "#1c2130",
-  board2: "#272c38",
-  band: "#fbd02f",
-  white: "#f7f9fb",
-  muted: "#b9bfcc",
+  board: "#101620",
+  board2: "#202731",
+  band: "#fbd034",
+  white: "#f8fafd",
+  muted: "#b5bfc9",
 };
 
 /** The two-plate wordmark, drawn for ImageResponse (flexbox only). */

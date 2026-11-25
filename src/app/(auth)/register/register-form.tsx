@@ -9,6 +9,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { FormAlert } from "@/components/domain/form-alert";
 import { PasswordInput } from "@/components/domain/password-input";
 import { Button } from "@/components/ui/button";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { Field, Input } from "@/components/ui/field";
 import { type ApiError, fromAuthError } from "@/lib/api/errors";
 import { authClient } from "@/lib/auth/client";
@@ -44,6 +45,8 @@ export function RegisterForm() {
     defaultValues: { role: preset, name: "", email: "", password: "" },
   });
   const { errors, isSubmitting } = form.formState;
+  // Until React hydrates, a native submit would GET the password into the URL; keep the button inert.
+  const hydrated = useHydrated();
   const role = useWatch({ control: form.control, name: "role" });
 
   async function onSubmit(values: RegisterValues) {
@@ -64,7 +67,7 @@ export function RegisterForm() {
   }
 
   return (
-    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+    <form noValidate method="post" onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
       <fieldset className="grid gap-3" aria-describedby={errors.role ? "role-error" : undefined}>
         <legend className="mb-3 font-bold">What brings you here?</legend>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -153,7 +156,7 @@ export function RegisterForm() {
         )}
       </Field>
 
-      <Button type="submit" variant="band" size="lg" block loading={isSubmitting}>
+      <Button type="submit" variant="band" size="lg" block loading={isSubmitting} disabled={!hydrated}>
         {isSubmitting ? "Creating your account" : "Create account"}
       </Button>
       <p className="text-step--1 text-ink-2">
