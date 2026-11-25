@@ -1,26 +1,393 @@
 @import "tailwindcss";
 
+/*
+ * Metric-matched fallback for Atkinson Hyperlegible Next (next/font ships no metrics for it).
+ * Values from Atkinson Hyperlegible: avg width 443/1000 vs Arial 913/2048 -> size-adjust 99.37%;
+ * ascent 950 and descent 290 per 1000, divided by that size-adjust.
+ */
+@font-face {
+  font-family: "Atkinson Fallback";
+  src: local("Arial"), local("ArialMT"), local("Roboto");
+  size-adjust: 99.37%;
+  ascent-override: 95.6%;
+  descent-override: 29.18%;
+  line-gap-override: 0%;
+}
+
+/*
+ * KejaLink tokens — "the stage board".
+ * Body-paint white ground, vinyl-black ink, the PSV-yellow band as committed material.
+ * Every colour is OKLCH; components only ever use the semantic names below.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  /* Ground */
+  --surface: oklch(0.985 0.004 240);
+  --surface-2: oklch(1 0 0);
+  --surface-sunk: oklch(0.955 0.006 240);
+  --line: oklch(0.89 0.008 240);
+  --line-strong: oklch(0.6 0.012 250);
+
+  /* Ink */
+  --ink: oklch(0.21 0.02 258);
+  --ink-2: oklch(0.38 0.02 258);
+  --ink-3: oklch(0.48 0.018 258);
+
+  /* Route board (ink panels) */
+  --board: oklch(0.2 0.022 258);
+  --board-2: oklch(0.27 0.022 258);
+  --on-board: oklch(0.97 0.004 240);
+  --on-board-2: oklch(0.8 0.018 250);
+  --board-line: oklch(0.36 0.02 258);
+
+  /* PSV yellow band: primary action + full-width fact strips, never sprinkled */
+  --band: oklch(0.87 0.165 92);
+  --band-hover: oklch(0.84 0.17 90);
+  --band-press: oklch(0.8 0.165 87);
+  --on-band: oklch(0.21 0.02 258);
+
+  /* Links and focus */
+  --accent: oklch(0.45 0.16 258);
+  --focus: oklch(0.52 0.2 258);
+
+  /* Semantic feedback */
+  --success: oklch(0.45 0.12 152);
+  --success-soft: oklch(0.94 0.05 152);
+  --warning: oklch(0.47 0.11 70);
+  --warning-soft: oklch(0.95 0.07 92);
+  --danger: oklch(0.5 0.19 27);
+  --danger-soft: oklch(0.95 0.035 25);
+  --info: oklch(0.45 0.13 250);
+  --info-soft: oklch(0.95 0.025 250);
+
+  /* Booking states (always paired with a label and an icon) */
+  --status-pending: var(--warning);
+  --status-pending-soft: var(--warning-soft);
+  --status-confirmed: var(--success);
+  --status-confirmed-soft: var(--success-soft);
+  --status-rejected: var(--danger);
+  --status-rejected-soft: var(--danger-soft);
+  --status-cancelled: oklch(0.44 0.012 258);
+  --status-cancelled-soft: oklch(0.94 0.006 258);
+  /* Listing moderation */
+  --status-published: var(--success);
+  --status-published-soft: var(--success-soft);
+  --status-moderated: var(--danger);
+  --status-moderated-soft: var(--danger-soft);
+
+  /* Elevation: sheets and dialogs only; plates sit flat on a 1px rule */
+  --shadow-1: 0 1px 2px oklch(0.2 0.02 258 / 0.06), 0 2px 6px oklch(0.2 0.02 258 / 0.06);
+  --shadow-2: 0 8px 24px oklch(0.2 0.02 258 / 0.14), 0 2px 6px oklch(0.2 0.02 258 / 0.08);
+  --scrim: oklch(0.15 0.02 258 / 0.55);
+
+  /* Radius: painted panels, square-ish */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+
+  /* Motion: "pulling in" — short horizontal travel, exponential ease-out */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 260ms;
+
+  /* Fluid type scale (360px → 1440px) */
+  --step--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  --step-1: clamp(1.125rem, 1.07rem + 0.25vw, 1.25rem);
+  --step-2: clamp(1.3125rem, 1.2rem + 0.5vw, 1.625rem);
+  --step-3: clamp(1.625rem, 1.42rem + 0.9vw, 2.25rem);
+  --step-4: clamp(2rem, 1.62rem + 1.7vw, 3.25rem);
+  --step-5: clamp(2.5rem, 1.9rem + 2.7vw, 4.5rem);
+  --step-6: clamp(3rem, 2.1rem + 4vw, 6rem);
+
+  --wrap: 76rem;
+  --gutter: clamp(1rem, 0.6rem + 1.8vw, 2rem);
+  --header-h: 3.5rem;
+}
+
+/* Dark tokens are ready; dark mode ships only after the light theme passes every gate. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: oklch(0.17 0.016 258);
+  --surface-2: oklch(0.21 0.018 258);
+  --surface-sunk: oklch(0.14 0.014 258);
+  --line: oklch(0.3 0.018 258);
+  --line-strong: oklch(0.55 0.018 258);
+  --ink: oklch(0.95 0.005 240);
+  --ink-2: oklch(0.82 0.012 250);
+  --ink-3: oklch(0.72 0.014 250);
+  --board: oklch(0.12 0.014 258);
+  --board-2: oklch(0.19 0.018 258);
+  --accent: oklch(0.78 0.11 250);
+  --focus: oklch(0.8 0.14 250);
+  --success-soft: oklch(0.28 0.05 152);
+  --warning-soft: oklch(0.3 0.06 85);
+  --danger-soft: oklch(0.3 0.07 25);
+  --info-soft: oklch(0.28 0.05 250);
+  --success: oklch(0.78 0.13 152);
+  --warning: oklch(0.85 0.13 88);
+  --danger: oklch(0.75 0.15 27);
+  --info: oklch(0.78 0.1 250);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-board: var(--board);
+  --color-board-2: var(--board-2);
+  --color-on-board: var(--on-board);
+  --color-on-board-2: var(--on-board-2);
+  --color-board-line: var(--board-line);
+  --color-band: var(--band);
+  --color-band-hover: var(--band-hover);
+  --color-band-press: var(--band-press);
+  --color-on-band: var(--on-band);
+  --color-accent: var(--accent);
+  --color-focus: var(--focus);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --font-sans: var(--font-text), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-board), var(--font-text), ui-sans-serif, sans-serif;
+
+  --text-step--1: var(--step--1);
+  --text-step-0: var(--step-0);
+  --text-step-1: var(--step-1);
+  --text-step-2: var(--step-2);
+  --text-step-3: var(--step-3);
+  --text-step-4: var(--step-4);
+  --text-step-5: var(--step-5);
+  --text-step-6: var(--step-6);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+
+  --ease-out: var(--ease-out);
+  --ease-in-out: var(--ease-in-out);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+    scrollbar-color: var(--line-strong) var(--surface-sunk);
+  }
+
+  body {
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    line-height: 1.55;
+    caret-color: var(--focus);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: var(--band);
+    color: var(--on-band);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* On ink panels the focus ring switches to the band so it stays visible. */
+  .on-board :focus-visible,
+  .on-board:focus-visible {
+    outline-color: var(--band);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    line-height: 1.1;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Money, counts, dates: figures that line up. */
+  .tabular,
+  table,
+  time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  [hidden] {
+    display: none !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Route-board lettering: condensed, black, caps. */
+  .board-type {
+    font-family: var(--font-display);
+    font-stretch: 68%;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .board-type-wide {
+    font-family: var(--font-display);
+    font-stretch: 80%;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: var(--wrap);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .measure {
+    max-width: 68ch;
+  }
+
+  /* The PSV band: a full-bleed strip with a broken line along its top edge. */
+  .band-rule {
+    height: 0.75rem;
+    background: repeating-linear-gradient(90deg, var(--band) 0 2.5rem, transparent 2.5rem 3rem);
+  }
+
+  .link {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklch, var(--accent) 45%, transparent);
+    transition: text-decoration-color var(--dur-1) var(--ease-out);
+  }
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .skip-link {
+    position: fixed;
+    left: 1rem;
+    top: 0.75rem;
+    z-index: 100;
+    transform: translateY(-200%);
+    background: var(--band);
+    color: var(--on-band);
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+  }
+  .skip-link:focus-visible {
+    transform: none;
+    outline-color: var(--ink);
+  }
+}
+
+@layer utilities {
+  .pull-in {
+    animation: pull-in var(--dur-3) var(--ease-out) both;
+  }
+}
+
+@keyframes pull-in {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+
+@keyframes skeleton {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Route-board readout: a line flips down into place when its value changes. */
+@keyframes board-flip {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35em);
+  }
 }
