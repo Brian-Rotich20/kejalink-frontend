@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Atkinson_Hyperlegible_Next } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
+import { Suspense } from "react";
+import { SiteHeader, SiteHeaderFallback } from "@/components/layout/site-header";
 import { siteUrl } from "@/lib/env/public";
 import "./globals.css";
 
@@ -17,6 +19,9 @@ const text = Atkinson_Hyperlegible_Next({
   subsets: ["latin"],
   variable: "--font-text",
   display: "swap",
+  // next/font has no metrics for the "Next" cut; a hand-tuned fallback (globals.css) prevents layout shift.
+  adjustFontFallback: false,
+  fallback: ["Atkinson Fallback", "system-ui", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -51,7 +56,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="skip-link">
           Skip to content
         </a>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Suspense fallback={<SiteHeaderFallback />}>
+            <SiteHeader />
+          </Suspense>
+          {children}
+        </Providers>
       </body>
     </html>
   );

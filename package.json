@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run test",
-    "e2e:backend": "node ../backend/node_modules/tsx/dist/cli.mjs --env-file=.env.e2e e2e/backend/harness.ts"
+    "e2e:backend": "node ../backend/node_modules/tsx/dist/cli.mjs --env-file=.env.e2e e2e/backend/harness.ts",
+    "e2e:seed": "node ../backend/node_modules/tsx/dist/cli.mjs e2e/backend/seed-dev.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.9",

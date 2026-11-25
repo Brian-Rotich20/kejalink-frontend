@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { makeQueryClient, type SessionProblem } from "@/lib/api/query-client";
 import { authClient } from "@/lib/auth/client";
 import { loginHref } from "@/lib/auth/roles";
+import { OfflineBanner } from "./offline-banner";
 
 let handling = false;
 
@@ -28,6 +29,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       <NuqsAdapter>{children}</NuqsAdapter>
+      <OfflineBanner />
       <Toaster
         position="bottom-center"
         closeButton

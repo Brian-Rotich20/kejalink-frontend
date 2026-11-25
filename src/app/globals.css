@@ -1,6 +1,20 @@
 @import "tailwindcss";
 
 /*
+ * Metric-matched fallback for Atkinson Hyperlegible Next (next/font ships no metrics for it).
+ * Values from Atkinson Hyperlegible: avg width 443/1000 vs Arial 913/2048 -> size-adjust 99.37%;
+ * ascent 950 and descent 290 per 1000, divided by that size-adjust.
+ */
+@font-face {
+  font-family: "Atkinson Fallback";
+  src: local("Arial"), local("ArialMT"), local("Roboto");
+  size-adjust: 99.37%;
+  ascent-override: 95.6%;
+  descent-override: 29.18%;
+  line-gap-override: 0%;
+}
+
+/*
  * KejaLink tokens — "the stage board".
  * Body-paint white ground, vinyl-black ink, the PSV-yellow band as committed material.
  * Every colour is OKLCH; components only ever use the semantic names below.
@@ -367,5 +381,13 @@
 @keyframes sheet-out {
   to {
     transform: translateY(100%);
+  }
+}
+
+/* Route-board readout: a line flips down into place when its value changes. */
+@keyframes board-flip {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35em);
   }
 }
