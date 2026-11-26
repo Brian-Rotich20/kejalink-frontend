@@ -2,18 +2,20 @@ import { expect, test } from "@playwright/test";
 import { account, apiAs, createListing, uid } from "./helpers";
 
 test.describe("browse, filter and view", () => {
-  test("search from the landing route board opens filtered results in the URL", async ({ page, baseURL }) => {
+  test("search from the landing page opens filtered results in the URL", async ({ page, baseURL }) => {
     const area = `Roysambu${uid()}`;
     const listerApi = await apiAs(baseURL!, account("TENANT"));
     await createListing(listerApi, { area, county: "Nairobi", propertyType: "STUDIO", priceAmount: 15000 });
 
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tafuta keja yako.");
-    const board = page.getByRole("search");
-    await board.getByLabel("Area, estate or campus").fill(area);
-    await board.getByLabel("Type").selectOption("STUDIO");
-    await board.getByLabel("Budget a month").selectOption("20000");
-    await board.getByRole("button", { name: "Show places" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Find a place to rent in Nairobi, from the people who let it.",
+    );
+    const search = page.getByRole("search", { name: "Search places to rent" });
+    await search.getByLabel("Where").fill(area);
+    await search.getByLabel("Type").selectOption("STUDIO");
+    await search.getByLabel("Budget a month").selectOption("20000");
+    await search.getByRole("button", { name: "Search" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/properties\\?.*area=${area}`));
     await expect(page).toHaveURL(/type=STUDIO/);
@@ -92,8 +94,8 @@ test.describe("browse, filter and view", () => {
     await expect(skip).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/#main$/);
-    // The route board is reachable and usable by keyboard.
-    await page.getByRole("search").getByLabel("Area, estate or campus").focus();
+    // The landing search is reachable and usable by keyboard.
+    await page.getByRole("search", { name: "Search places to rent" }).getByLabel("Where").focus();
     await page.keyboard.type("Kilimani");
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/area=Kilimani/);

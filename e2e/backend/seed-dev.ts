@@ -54,13 +54,32 @@ const LISTINGS = [
 ] as const;
 
 /**
+ * Photos for local review only, downloaded at seed time (never committed or shipped). Unsplash
+ * licence; credits: Cytonn Photography (Nairobi), deborah cortelazzi, Patrick Perkins, Clay Banks,
+ * Naomi Hébert, Frames For Your Heart. Production listings carry only their listers' own photos.
+ */
+const PHOTOS = [
+  "1658218635253-64728f6234be",
+  "1658218729615-167c32d70537",
+  "1522708323590-d24dbb6b0267",
+  "1502672260266-1c1ef2d93688",
+  "1773578978637-c9771e7a9913",
+  "1484154218962-a197022b5858",
+  "1512918728675-ed5a9ecdebfd",
+].map((id) => `https://images.unsplash.com/photo-${id}?w=1600&q=80&fm=jpg`);
+
+/**
  * Authored sample listings for local review only, labelled as samples in their descriptions.
  * No photos: stand-in pictures of other places would misrepresent a listing; the designed
  * "No photo yet" state shows instead. One sample is marked taken to show that state.
  */
 async function main() {
   const cookie = await signUp("Sample Lister", "sample-lister@e2e.kejalink.test", "TENANT");
-  for (const [title, propertyType, priceAmount, bedrooms, bathrooms, county, area, available] of LISTINGS) {
+  const photos = await Promise.all(
+    PHOTOS.map(async (url) => new Blob([await (await fetch(url)).arrayBuffer()], { type: "image/jpeg" })),
+  );
+  let shot = 0;
+  for (const [index, [title, propertyType, priceAmount, bedrooms, bathrooms, county, area, available]] of LISTINGS.entries()) {
     const { body } = await call("/properties", {
       method: "POST",
       cookie,
@@ -77,6 +96,15 @@ async function main() {
       },
     });
     const id = (body.data as { id: string }).id;
+    // Every listing but the last gets two or three photos; the last shows the no-photo state.
+    if (index < LISTINGS.length - 1) {
+      for (let i = 0; i < 2 + (index % 2); i += 1) {
+        const form = new FormData();
+        form.append("file", photos[shot % photos.length] as Blob, "photo.jpg");
+        shot += 1;
+        await call(`/properties/${id}/uploads`, { method: "POST", cookie, body: form });
+      }
+    }
     if (!available)
       await call(`/properties/${id}`, { method: "PATCH", cookie, body: { isAvailable: false } });
     console.log(`seeded ${area}: ${title}`);
