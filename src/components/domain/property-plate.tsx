@@ -99,20 +99,26 @@ export function PropertyPlate({
         !property.isAvailable && "bg-surface",
       )}
     >
-      <div className="relative">
-        <PhotoFrame src={property.primaryImageUrl} alt="" sizes={sizes} priority={priority} />
-        <AvailabilityPlate available={property.isAvailable} className="absolute top-3 left-3" />
-      </div>
-      <div className="on-board flex items-baseline justify-between gap-3 bg-board px-4 py-3 text-on-board">
-        <p className="board-type min-w-0 truncate text-step-2">{property.area}</p>
-        <p className="shrink-0 text-step--1 text-on-board-2">{property.county}</p>
+      <PhotoFrame src={property.primaryImageUrl} alt="" sizes={sizes} priority={priority} />
+      {/* The route board: where it is, what it costs, whether there is room. */}
+      <div className="on-board grid gap-2 bg-board px-4 py-3 text-on-board">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="board-type min-w-0 truncate text-step-2">{property.area}</p>
+          <p className="board-type shrink-0 text-step-2 whitespace-nowrap">
+            <span className="sr-only">Rent: </span>
+            <span className="board-type-wide text-[0.75rem] text-on-board-2">KES </span>
+            {formatAmount(property.priceAmount)}
+            <span className="sr-only"> a month</span>
+          </p>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <AvailabilityPlate available={property.isAvailable} ground="board" />
+          <p aria-hidden className="text-step--1 text-on-board-2">
+            per month
+          </p>
+        </div>
       </div>
       <div className="grid flex-1 content-start gap-2 px-4 pt-3 pb-4">
-        <p className="flex items-baseline gap-1.5">
-          <span className="board-type-wide text-step--1 text-ink-2">KES</span>
-          <span className="board-type text-step-3">{formatAmount(property.priceAmount)}</span>
-          <span className="text-step--1 text-ink-3">/ month</span>
-        </p>
         <Heading className="line-clamp-2 leading-snug font-bold text-ink">
           <Link
             href={href}
@@ -122,6 +128,7 @@ export function PropertyPlate({
           </Link>
         </Heading>
         <ul className="flex flex-wrap gap-x-4 gap-y-1 text-step--1 text-ink-2">
+          <li>{property.county}</li>
           <li>{PROPERTY_TYPE_LABEL[property.propertyType]}</li>
           {beds ? (
             <li className="inline-flex items-center gap-1">
@@ -146,9 +153,8 @@ export function PropertyPlateSkeleton() {
   return (
     <div aria-hidden className="overflow-hidden rounded-md border border-line bg-surface-2">
       <div className="aspect-[4/3] animate-[skeleton_1.6s_var(--ease-in-out)_infinite] bg-surface-sunk motion-reduce:animate-none" />
-      <div className="h-11 bg-board/85" />
+      <div className="h-21 bg-board/85" />
       <div className="grid gap-3 px-4 pt-3 pb-4">
-        <div className="h-7 w-1/2 rounded-sm bg-surface-sunk" />
         <div className="h-5 w-4/5 rounded-sm bg-surface-sunk" />
         <div className="h-4 w-2/5 rounded-sm bg-surface-sunk" />
       </div>

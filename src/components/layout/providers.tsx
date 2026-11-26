@@ -3,11 +3,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { useState, type ReactNode } from "react";
-import { Toaster } from "sonner";
+import dynamic from "next/dynamic";
 import { makeQueryClient, type SessionProblem } from "@/lib/api/query-client";
 import { authClient } from "@/lib/auth/client";
 import { loginHref } from "@/lib/auth/roles";
 import { OfflineBanner } from "./offline-banner";
+
+/** Toasts only ever follow an action, so their code loads after the page, not with it. */
+const Toaster = dynamic(() => import("sonner").then((m) => m.Toaster), { ssr: false });
 
 let handling = false;
 

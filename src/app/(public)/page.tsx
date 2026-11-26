@@ -207,26 +207,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section aria-labelledby="trust-title" className="bg-surface-sunk">
-        <div className="wrap grid gap-10 py-14 md:grid-cols-[1.1fr_1fr] md:gap-16 md:py-20">
-          <div className="grid content-start gap-5">
+      <section aria-labelledby="trust-title">
+        {/* The figures ride the band, as a full-width fact strip, set in a sentence. */}
+        <div className="bg-band text-on-band">
+          <div className="wrap grid gap-3 py-10 md:py-12">
             <h2 id="trust-title" className="board-type text-step-4">
               In Kenya’s towns, most renters deal with a person, not a company
             </h2>
-            <dl className="grid grid-cols-2 gap-6">
-              <div className="grid gap-1">
-                <dt className="order-2 text-ink-2">of urban households in Kenya rent their home</dt>
-                <dd className="board-type order-1 text-step-5">78.7%</dd>
-              </div>
-              <div className="grid gap-1">
-                <dt className="order-2 text-ink-2">of urban rentals are let by individuals</dt>
-                <dd className="board-type order-1 text-step-5">~89%</dd>
-              </div>
-            </dl>
-            <p className="text-step--1 text-ink-3">
+            <p className="measure text-step-1">
+              <strong className="board-type text-step-3">78.7%</strong> of urban households in Kenya rent
+              their home, and <strong className="board-type text-step-3">about 89%</strong> of urban rentals
+              are let by individuals.
+            </p>
+            <p className="text-step--1">
               Source: Kenya National Bureau of Statistics, 2019 Kenya Population and Housing Census.
             </p>
-            <p className="measure text-ink-2">
+          </div>
+        </div>
+        <div className="wrap grid gap-10 py-14 md:grid-cols-[1.1fr_1fr] md:gap-16 md:py-20">
+          <div className="grid content-start gap-5">
+            <p className="measure text-step-1 text-ink-2">
               So the person you deal with is usually just that: a person. KejaLink shows you who they are,
               keeps every listing&apos;s availability honest, and gives you a clear answer before you travel
               to view.
@@ -253,6 +253,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <div aria-hidden className="band-rule" />
 
       <section aria-labelledby="list-title" className="wrap py-14 md:py-20">
         <div className="on-board grid gap-6 rounded-md bg-board p-6 text-on-board md:grid-cols-[1fr_auto] md:items-center md:p-10">

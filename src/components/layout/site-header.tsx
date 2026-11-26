@@ -1,19 +1,20 @@
 "use client";
 
-import { LogOut, Menu, UserRound } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import type { UserRole } from "@/lib/api/schemas/common";
 import { authClient, useSession } from "@/lib/auth/client";
 import { ROLE_HOME } from "@/lib/auth/roles";
-import { cn } from "@/lib/cn";
-import type { UserRole } from "@/lib/api/schemas/common";
+import { NavLink, type NavItem } from "./nav-link";
 import { Wordmark } from "./wordmark";
 
-type NavItem = { href: string; label: string };
+/** The phone menu sheet (and the dialog code behind it) loads on first open, not with the page. */
+const MobileMenu = dynamic(() => import("./mobile-menu"), { ssr: false });
 
 const PUBLIC_NAV: NavItem[] = [
   { href: "/properties", label: "Browse places" },
@@ -39,31 +40,12 @@ const ROLE_NAV: Record<UserRole, NavItem[]> = {
 const isRole = (value: unknown): value is UserRole =>
   value === "SEEKER" || value === "TENANT" || value === "ADMIN";
 
-function NavLink({ item, onClick, large }: { item: NavItem; onClick?: () => void; large?: boolean }) {
-  const pathname = usePathname();
-  const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-  return (
-    <Link
-      href={item.href}
-      onClick={onClick}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "relative inline-flex min-h-11 items-center px-1 font-bold text-ink-2 transition-colors hover:text-ink",
-        "aria-[current=page]:text-ink",
-        large
-          ? "board-type w-full border-b border-line py-3 text-step-3 text-ink"
-          : "after:absolute after:inset-x-1 after:bottom-1.5 after:h-[3px] after:origin-left after:scale-x-0 after:bg-band after:transition-transform after:duration-(--dur-2) hover:after:scale-x-100 aria-[current=page]:after:scale-x-100",
-      )}
-    >
-      {item.label}
-    </Link>
-  );
-}
-
 export function SiteHeader() {
   const { data, isPending } = useSession();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  // Mount the lazy menu only once it has been asked for.
+  const [menuLoaded, setMenuLoaded] = useState(false);
   const user = data?.user;
   const role = isRole(user?.role) ? user.role : null;
   const nav = role ? ROLE_NAV[role] : PUBLIC_NAV;
@@ -132,61 +114,40 @@ export function SiteHeader() {
             </div>
           )}
 
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-on-board hover:bg-board-2 md:hidden">
-                <Menu aria-hidden className="size-6" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent variant="sheet" title="Menu">
-              <nav aria-label="Main" className="grid">
-                {nav.map((item) => (
-                  <NavLink key={item.href} item={item} large onClick={() => setOpen(false)} />
-                ))}
-                {role ? (
-                  <NavLink
-                    item={{ href: `${ROLE_HOME[role]}/account`, label: "Account" }}
-                    large
-                    onClick={() => setOpen(false)}
-                  />
-                ) : (
-                  <NavLink
-                    item={{ href: "/how-it-works", label: "How it works" }}
-                    large
-                    onClick={() => setOpen(false)}
-                  />
-                )}
-              </nav>
-              <div className="mt-6 grid gap-3">
-                {user ? (
-                  <>
-                    <p className="flex items-center gap-3 text-ink-2">
-                      <UserRound aria-hidden className="size-5" />
-                      Signed in as <strong className="text-ink">{user.name}</strong>
-                    </p>
-                    <Button block onClick={signOut}>
-                      <LogOut aria-hidden />
-                      Sign out
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button asChild variant="band" block size="lg">
-                      <Link href="/login" onClick={() => setOpen(false)}>
-                        Sign in
-                      </Link>
-                    </Button>
-                    <Button asChild block size="lg">
-                      <Link href="/register?as=tenant" onClick={() => setOpen(false)}>
-                        List a place
-                      </Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
+          {/* Phones: sign-in stays one tap away beside the menu. */}
+          {!isPending && !user ? (
+            <Link
+              href="/login"
+              className="inline-flex min-h-11 items-center px-2 font-bold text-on-board underline-offset-4 hover:underline md:hidden"
+            >
+              Sign in
+            </Link>
+          ) : null}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-on-board hover:bg-board-2 md:hidden"
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            onClick={() => {
+              setMenuLoaded(true);
+              setOpen(true);
+            }}
+          >
+            <Menu aria-hidden className="size-6" />
+            <span className="sr-only">Open menu</span>
+          </Button>
+          {menuLoaded ? (
+            <MobileMenu
+              open={open}
+              onOpenChange={setOpen}
+              nav={nav}
+              role={role}
+              userName={user?.name ?? null}
+              onSignOut={signOut}
+            />
+          ) : null}
         </div>
       </div>
     </header>

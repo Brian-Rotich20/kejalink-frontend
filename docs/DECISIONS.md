@@ -182,3 +182,54 @@ request and "Taken down" for a moderated listing; the codes are unchanged.
 Photos are resized in the browser to a 1600 px long edge and re-encoded as WebP, or JPEG where
 WebP encoding isn't available. Quality steps down from 0.82 until the photo is under 3.5 MB. EXIF
 orientation is applied. A 1 MB+ camera-size JPEG is uploaded in e2e to prove it.
+
+## F-21 Finish review: ink, not slate
+
+Impeccable's independent finish reviewer returned **fix** with eight material items, all applied
+in one batch. Its verdict pass then scored every one **resolved**:
+
+1. The ink family is neutral vinyl black (hue 90, chroma 0.004), not blue-black slate.
+2. Links and the focus ring are ink; there is no link blue.
+3. The "Where to?" label above the board is screen-reader only.
+4. Yellow is reserved for the band, band rules, the KNBS fact strip and one primary action per
+   screen.
+5. The listing plate's ink board carries area, fare and availability.
+6. The KNBS figures are one band fact strip set in a sentence (no big-number block).
+7. Every public section closes on the band rule.
+8. Phones get a visible "Sign in", and local fixtures are authored, labelled samples with no
+   stand-in photos.
+
+Open, not scored: at 360 × 780 the safety band starts ~29 px below the fold. "Show places" is
+inside it.
+
+## F-22 Performance: what we measured and how
+
+Lighthouse 12 and 13 cannot record a performance trace on the installed Chrome 158
+(`NO_NAVSTART`), and installing an older Chromium failed. Accessibility, Best Practices and SEO ran
+normally. Performance was measured with `e2e/measure/vitals.mjs`, which applies Lighthouse's
+mobile throttling for real (4× CPU, 150 ms RTT, 1.6 Mbps down) and reads LCP, CLS and long-task
+time over 3 runs.
+
+To bring the landing page down from 284 KB to 229 KB of initial gzipped JS:
+
+- The browser env module no longer uses Zod (about 39 KB). The server still validates with Zod
+  at startup.
+- The Better Auth plugin is built locally, so the `better-auth/client/plugins` barrel stays out of
+  the bundle.
+- The toaster and the phone menu sheet load lazily.
+
+The remaining 229 KB is mostly the React 19 + Next 16 runtime (react-dom alone is 72 KB), so the
+brief's ~170 KB target is not met.
+
+## F-23 Streaming metadata kept
+
+Dynamic pages stream their `<title>`/description (Next 16's default). HTML-limited crawlers still
+get blocking metadata, and Google renders JS. Lighthouse's SEO audit therefore flags "no meta
+description" on `/properties` and listing pages. Forcing blocking metadata for every visitor
+(`htmlLimitedBots: /.*/`) would add the API round-trip to TTFB on every page view, which we judged
+worse for this audience on 3G.
+
+## F-24 Zod runs jitless
+
+Zod 4 probes for `eval` (`Function("")`) to enable its JIT. The CSP forbids eval, so the probe only
+logged a CSP issue. `z.config({ jitless: true })` is set where the schemas load.

@@ -13,7 +13,7 @@ const boardField =
 
 const selectChevron =
   "appearance-none bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat pr-9 " +
-  "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c9cdd6' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]";
+  "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c5c4c0' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]";
 
 /** One line of the destination readout. Callers key it by value, so a change remounts it and it flips. */
 function ReadoutLine({ value, muted }: { value: string; muted?: boolean }) {
@@ -61,17 +61,20 @@ export function RouteBoardSearch({ className }: { className?: string }) {
         }
       }}
       aria-labelledby={`${id}-title`}
-      className={cn("on-board overflow-hidden rounded-md bg-board text-on-board shadow-2", className)}
+      className={cn("on-board overflow-hidden rounded-md bg-board text-on-board", className)}
     >
       <div className="border-b border-board-line px-4 pt-4 pb-3 sm:px-6">
-        <h2 id={`${id}-title`} className="board-type-wide text-step--1 text-band">
+        <h2 id={`${id}-title`} className="sr-only">
           Where to?
         </h2>
-        <p aria-hidden className="board-type mt-1 flex flex-wrap gap-x-3 text-step-3 sm:text-step-4">
+        <p
+          aria-hidden
+          className="board-type flex flex-col gap-y-1 text-step-3 sm:flex-row sm:flex-wrap sm:gap-x-3 sm:text-step-4"
+        >
           <ReadoutLine key={`w-${where}`} value={where} />
-          <span className="text-band">·</span>
+          <span className="hidden text-on-board-2 sm:inline">·</span>
           <ReadoutLine key={`t-${what}`} value={what} muted={!type} />
-          <span className="text-band">·</span>
+          <span className="hidden text-on-board-2 sm:inline">·</span>
           <ReadoutLine key={`b-${budget}`} value={budget} muted={!maxPrice} />
         </p>
       </div>

@@ -24,33 +24,33 @@
   color-scheme: light;
 
   /* Ground */
-  --surface: oklch(0.985 0.004 240);
+  --surface: oklch(0.985 0.002 95);
   --surface-2: oklch(1 0 0);
-  --surface-sunk: oklch(0.955 0.006 240);
-  --line: oklch(0.89 0.008 240);
-  --line-strong: oklch(0.6 0.012 250);
+  --surface-sunk: oklch(0.955 0.003 95);
+  --line: oklch(0.89 0.004 90);
+  --line-strong: oklch(0.6 0.004 90);
 
   /* Ink */
-  --ink: oklch(0.21 0.02 258);
-  --ink-2: oklch(0.38 0.02 258);
-  --ink-3: oklch(0.48 0.018 258);
+  --ink: oklch(0.18 0.004 90);
+  --ink-2: oklch(0.36 0.004 90);
+  --ink-3: oklch(0.47 0.004 90);
 
   /* Route board (ink panels) */
-  --board: oklch(0.2 0.022 258);
-  --board-2: oklch(0.27 0.022 258);
-  --on-board: oklch(0.97 0.004 240);
-  --on-board-2: oklch(0.8 0.018 250);
-  --board-line: oklch(0.36 0.02 258);
+  --board: oklch(0.17 0.004 90);
+  --board-2: oklch(0.25 0.004 90);
+  --on-board: oklch(0.97 0.003 95);
+  --on-board-2: oklch(0.82 0.006 90);
+  --board-line: oklch(0.34 0.004 90);
 
   /* PSV yellow band: primary action + full-width fact strips, never sprinkled */
   --band: oklch(0.87 0.165 92);
   --band-hover: oklch(0.84 0.17 90);
   --band-press: oklch(0.8 0.165 87);
-  --on-band: oklch(0.21 0.02 258);
+  --on-band: oklch(0.18 0.004 90);
 
   /* Links and focus */
-  --accent: oklch(0.45 0.16 258);
-  --focus: oklch(0.52 0.2 258);
+  --accent: oklch(0.18 0.004 90);
+  --focus: oklch(0.18 0.004 90);
 
   /* Semantic feedback */
   --success: oklch(0.45 0.12 152);
@@ -69,8 +69,8 @@
   --status-confirmed-soft: var(--success-soft);
   --status-rejected: var(--danger);
   --status-rejected-soft: var(--danger-soft);
-  --status-cancelled: oklch(0.44 0.012 258);
-  --status-cancelled-soft: oklch(0.94 0.006 258);
+  --status-cancelled: oklch(0.42 0.004 90);
+  --status-cancelled-soft: oklch(0.94 0.003 90);
   /* Listing moderation */
   --status-published: var(--success);
   --status-published-soft: var(--success-soft);
@@ -78,9 +78,9 @@
   --status-moderated-soft: var(--danger-soft);
 
   /* Elevation: sheets and dialogs only; plates sit flat on a 1px rule */
-  --shadow-1: 0 1px 2px oklch(0.2 0.02 258 / 0.06), 0 2px 6px oklch(0.2 0.02 258 / 0.06);
-  --shadow-2: 0 8px 24px oklch(0.2 0.02 258 / 0.14), 0 2px 6px oklch(0.2 0.02 258 / 0.08);
-  --scrim: oklch(0.15 0.02 258 / 0.55);
+  --shadow-1: 0 1px 2px oklch(0.18 0.004 90 / 0.06), 0 2px 6px oklch(0.18 0.004 90 / 0.06);
+  --shadow-2: 0 8px 24px oklch(0.18 0.004 90 / 0.14), 0 2px 6px oklch(0.18 0.004 90 / 0.08);
+  --scrim: oklch(0.12 0.004 90 / 0.6);
 
   /* Radius: painted panels, square-ish */
   --radius-xs: 2px;
@@ -303,14 +303,19 @@
     background-size: 3rem 100%;
   }
 
+  /* Links are ink with an ink underline that thickens on hover: no link blue. */
   .link {
-    color: var(--accent);
+    color: var(--ink);
     text-decoration: underline;
-    text-decoration-color: color-mix(in oklch, var(--accent) 45%, transparent);
-    transition: text-decoration-color var(--dur-1) var(--ease-out);
+    text-decoration-color: color-mix(in oklch, var(--ink) 55%, transparent);
+    text-decoration-thickness: 1px;
+    transition:
+      text-decoration-color var(--dur-1) var(--ease-out),
+      text-decoration-thickness var(--dur-1) var(--ease-out);
   }
   .link:hover {
     text-decoration-color: currentColor;
+    text-decoration-thickness: 2px;
   }
 
   .skip-link {
