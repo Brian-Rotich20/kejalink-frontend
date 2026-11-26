@@ -35,6 +35,12 @@ export default function MobileMenu({
           {nav.map((item) => (
             <NavLink key={item.href} item={item} large onClick={close} />
           ))}
+          {role === "SEEKER" ? (
+            <NavLink item={{ href: "/seeker/saved", label: "Saved places" }} large onClick={close} />
+          ) : null}
+          {role === "TENANT" ? (
+            <NavLink item={{ href: "/tenant/properties/new", label: "Add listing" }} large onClick={close} />
+          ) : null}
           {role ? (
             <NavLink item={{ href: `${ROLE_HOME[role]}/account`, label: "Account" }} large onClick={close} />
           ) : (

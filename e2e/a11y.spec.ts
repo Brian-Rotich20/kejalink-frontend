@@ -69,6 +69,8 @@ test.describe("accessibility (axe, WCAG 2.2 AA)", () => {
 
   test("admin screens", async ({ page }) => {
     test.skip(!ADMIN.password, "E2E_ADMIN_PASSWORD not set");
+    // Four pages, each scanned by axe: more than one default timeout on a loaded machine.
+    test.slow();
     await loginUi(page, ADMIN.email, ADMIN.password);
     await expect(page).toHaveURL(/\/admin$/);
     for (const path of ["/admin", "/admin/users", "/admin/properties", "/admin/bookings"]) {

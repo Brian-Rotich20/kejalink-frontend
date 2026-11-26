@@ -41,6 +41,9 @@ export async function createListing(
     county: string;
     priceAmount: number;
     propertyType: string;
+    amenities: string[];
+    latitude: number;
+    longitude: number;
   }> = {},
 ) {
   const res = await ctx.post("/api/properties", {
@@ -53,7 +56,8 @@ export async function createListing(
       bathrooms: 1,
       county: overrides.county ?? "Kiambu",
       area: overrides.area ?? `Kahawa ${uid()}`,
-      amenities: ["Water 24/7"],
+      amenities: overrides.amenities ?? ["Water 24/7"],
+      ...(overrides.latitude !== undefined ? { latitude: overrides.latitude, longitude: overrides.longitude } : {}),
     },
   });
   expect(res.status(), await res.text()).toBe(201);

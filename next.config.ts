@@ -5,6 +5,11 @@ const isDev = process.env.NODE_ENV !== "production";
 /** Only set when app and API share a domain (direct browser calls); otherwise everything is same-origin. */
 const apiBase = process.env.NEXT_PUBLIC_API_BASE?.trim().replace(/\/+$/, "") || "";
 
+/** Map basemap tiles (see src/lib/env/public.ts); `{s}` subdomains become a wildcard host. */
+const DEFAULT_TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const tilesUrl = process.env.NEXT_PUBLIC_MAP_TILES_URL?.trim() || DEFAULT_TILES;
+const tilesHost = tilesUrl.replace("{s}", "*").match(/^https:\/\/[^/]+/)?.[0] ?? "";
+
 /**
  * Strict CSP without nonces: nonces would force every page to render per request and defeat the
  * static shells Cache Components produces. Inline scripts are Next's own bootstrap/RSC payload.
@@ -13,7 +18,7 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://res.cloudinary.com",
+  `img-src 'self' data: blob: https://res.cloudinary.com${tilesHost ? ` ${tilesHost}` : ""}`,
   "font-src 'self'",
   `connect-src 'self'${apiBase ? ` ${apiBase}` : ""}${isDev ? " ws: wss:" : ""}`,
   "media-src 'self'",

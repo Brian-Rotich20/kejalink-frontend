@@ -57,7 +57,21 @@ export const publicEnv = {
     "NEXT_PUBLIC_SUPPORT_EMAIL",
     blankToUndefined(process.env.NEXT_PUBLIC_SUPPORT_EMAIL),
   ),
+  /**
+   * Map basemap tiles ({s}/{z}/{x}/{y}/{r} template, https only). The default is OpenStreetMap's
+   * own tile server, which allows only light use: set a keyed provider (MapTiler, Stadia, Thunderforest)
+   * here before production traffic, with its attribution below.
+   */
+  NEXT_PUBLIC_MAP_TILES_URL:
+    blankToUndefined(process.env.NEXT_PUBLIC_MAP_TILES_URL) ?? "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  NEXT_PUBLIC_MAP_ATTRIBUTION:
+    blankToUndefined(process.env.NEXT_PUBLIC_MAP_ATTRIBUTION) ??
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 };
 
 export const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 export const supportEmail = publicEnv.NEXT_PUBLIC_SUPPORT_EMAIL ?? null;
+export const mapTiles = {
+  url: publicEnv.NEXT_PUBLIC_MAP_TILES_URL,
+  attribution: publicEnv.NEXT_PUBLIC_MAP_ATTRIBUTION,
+};

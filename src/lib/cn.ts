@@ -5,7 +5,7 @@ import { extendTailwindMerge } from "tailwind-merge";
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
-      text: ["step--1", "step-0", "step-1", "step-2", "step-3", "step-4", "step-5", "step-6"],
+      text: ["step--3", "step--2", "step--1", "step-0", "step-1", "step-2", "step-3", "step-4", "step-5", "step-6"],
     },
   },
 });

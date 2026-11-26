@@ -20,7 +20,7 @@ test.describe("browse, filter and view", () => {
     await expect(page).toHaveURL(new RegExp(`/properties\\?.*area=${area}`));
     await expect(page).toHaveURL(/type=STUDIO/);
     await expect(page).toHaveURL(/maxPrice=20000/);
-    await expect(page.getByRole("status").filter({ hasText: /^1 place/ })).toBeVisible();
+    await expect(page.getByRole("status").filter({ hasText: /^1 listing/ })).toBeVisible();
     await expect(page.getByRole("article")).toHaveCount(1);
   });
 
@@ -30,7 +30,8 @@ test.describe("browse, filter and view", () => {
   }) => {
     await page.goto("/properties?county=Nairobi&maxPrice=1");
     await expect(page.getByText("No places match these filters")).toBeVisible();
-    await page.getByRole("button", { name: "Clear all filters" }).click();
+    // The empty state's reset (the filter column has its own on wide screens).
+    await page.getByRole("button", { name: "Reset filters" }).last().click();
     await expect(page).toHaveURL(/\/properties$/);
 
     if (isMobile) {

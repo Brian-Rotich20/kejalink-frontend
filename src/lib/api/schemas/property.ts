@@ -20,6 +20,9 @@ export const propertyListItem = z.object({
   area: z.string(),
   isAvailable: z.boolean(),
   primaryImageUrl: z.url().nullable(),
+  /** Map pin; absent from APIs that predate pins, null when the lister has not placed one. */
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   createdAt: timestamp,
 });
 export type PropertyListItem = z.infer<typeof propertyListItem>;
@@ -56,6 +59,8 @@ export const propertyDetail = z.object({
   area: z.string(),
   addressText: z.string().nullable(),
   amenities: z.array(z.string()),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   status: propertyStatus,
   isAvailable: z.boolean(),
   rejectionReason: z.string().nullable().optional(),
