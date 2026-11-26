@@ -13,7 +13,7 @@ const label = "text-step--1 font-medium text-ink-2";
 const control = "w-full min-h-7 bg-transparent text-step-0 text-ink outline-none placeholder:text-ink-3";
 const chevron =
   "appearance-none bg-[length:0.9rem] bg-[right_0_center] bg-no-repeat pr-6 " +
-  "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b2622' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]";
+  "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f2427' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]";
 
 /**
  * The home page search: one ivory panel divided by hairlines (where, type, budget, search).

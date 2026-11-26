@@ -20,7 +20,7 @@ export function NavLink({ item, onClick, large }: { item: NavItem; onClick?: () 
         "aria-[current=page]:text-ink",
         large
           ? "headline w-full border-b border-line py-3 text-step-3 text-ink"
-          : "after:absolute after:inset-x-1 after:bottom-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-band after:transition-transform after:duration-(--dur-2) hover:after:scale-x-100 aria-[current=page]:after:scale-x-100",
+          : "after:absolute after:inset-x-1 after:bottom-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-(--dur-2) hover:after:scale-x-100 aria-[current=page]:after:scale-x-100",
       )}
     >
       {item.label}

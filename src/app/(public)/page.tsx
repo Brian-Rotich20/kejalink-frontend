@@ -247,7 +247,7 @@ export default function LandingPage() {
           <ol className="grid gap-8 md:col-span-7 md:col-start-6">
             {STEPS.map((step, i) => (
               <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-line pt-5">
-                <span aria-hidden className="headline text-step-3 leading-none text-clay">
+                <span aria-hidden className="headline text-step-3 leading-none text-accent-text">
                   {i + 1}
                 </span>
                 <div className="grid gap-1">
@@ -297,19 +297,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section aria-labelledby="list-title" className="on-forest bg-forest text-on-forest">
+      <section aria-labelledby="list-title" className="on-primary bg-primary text-on-primary">
         <div className="wrap grid gap-6 py-16 md:grid-cols-12 md:items-end md:gap-6 md:py-20">
           <div className="grid gap-3 md:col-span-7">
             <h2 id="list-title" className="display text-step-5">
               Letting a room, a bedsitter or a house?
             </h2>
-            <p className="measure text-on-forest-2">
+            <p className="measure text-on-primary-2">
               List it from your phone in a few minutes. Requests come to you, you choose who views it, and
               your email is shared only with the person you confirm.
             </p>
           </div>
           <div className="md:col-span-4 md:col-start-9 md:justify-self-end">
-            <Button asChild size="lg" className="border-0 bg-paper text-forest hover:bg-ground">
+            <Button asChild size="lg" className="border-0 bg-paper text-primary hover:bg-ground">
               <Link href="/register?as=tenant">List your place</Link>
             </Button>
           </div>

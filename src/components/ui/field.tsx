@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 
 const control =
   "block w-full min-h-11 rounded-sm border border-line-strong bg-paper px-3 text-ink placeholder:text-ink-3 " +
-  "transition-[border-color] duration-(--dur-1) hover:border-ink-2 focus-visible:border-forest " +
+  "transition-[border-color] duration-(--dur-1) hover:border-ink-2 focus-visible:border-primary " +
   "focus-visible:outline-2 focus-visible:outline-offset-0 aria-invalid:border-danger aria-invalid:outline-danger " +
   "disabled:cursor-not-allowed disabled:bg-sunk disabled:text-ink-3";
 
@@ -24,7 +24,7 @@ export function NativeSelect({ className, children, ...props }: ComponentProps<"
       className={cn(
         control,
         "appearance-none bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat pr-10",
-        "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b2622' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
+        "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f2427' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
         className,
       )}
       {...props}
@@ -52,7 +52,7 @@ export function Field({ label, hint, error, optional, className, children }: Fie
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
   return (
     <div className={cn("grid gap-1.5", className)}>
-      <label htmlFor={id} className="font-medium text-ink">
+      <label htmlFor={id} className="text-step--1 font-semibold text-ink">
         {label}
         {optional ? <span className="ml-1.5 font-normal text-ink-3">(optional)</span> : null}
       </label>

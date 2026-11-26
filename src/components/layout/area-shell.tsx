@@ -46,7 +46,7 @@ function PendingBadge({ side }: { side: "mine" | "received" }) {
   const { data } = usePendingCount(side);
   if (!data) return null;
   return (
-    <span className="tabular ml-1.5 inline-grid min-w-5 place-items-center rounded-pill bg-band px-1.5 text-[0.75rem] leading-5 font-bold text-on-band">
+    <span className="tabular ml-1.5 inline-grid min-w-5 place-items-center rounded-pill bg-primary px-1.5 text-[0.75rem] leading-5 font-bold text-on-primary">
       {data > 99 ? "99+" : data}
       <span className="sr-only"> pending</span>
     </span>

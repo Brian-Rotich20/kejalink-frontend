@@ -40,7 +40,7 @@ export function Providers({ children }: { children: ReactNode }) {
           classNames: {
             toast: "!rounded-sm !border !border-line !bg-paper !font-sans !text-ink !shadow-2 !text-step--1",
             description: "!text-ink-2",
-            actionButton: "!bg-forest !text-on-forest !font-semibold",
+            actionButton: "!bg-primary !text-on-primary !font-semibold",
             closeButton: "!bg-paper !text-ink !border-line",
           },
         }}

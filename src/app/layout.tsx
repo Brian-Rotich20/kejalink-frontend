@@ -1,21 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Newsreader } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import { Suspense } from "react";
 import { SiteHeader, SiteHeaderFallback } from "@/components/layout/site-header";
 import { siteUrl } from "@/lib/env/public";
 import "./globals.css";
 
-/** Editorial headings and selected statements: optical sizes 6–72 follow the set size. */
-const editorial = Newsreader({
-  subsets: ["latin"],
-  axes: ["opsz"],
-  style: ["normal", "italic"],
-  variable: "--font-editorial",
-  display: "swap",
-});
-
-/** Interface text, labels, figures. */
+/** The one typeface (references R1-R3): headings, interface text, figures. */
 const text = DM_Sans({
   subsets: ["latin"],
   axes: ["opsz"],
@@ -42,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f1ede4",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -50,7 +41,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-KE" className={`${editorial.variable} ${text.variable}`}>
+    <html lang="en-KE" className={text.variable}>
       <body className="flex min-h-dvh flex-col">
         <a href="#main" className="skip-link">
           Skip to content
