@@ -5,12 +5,12 @@ import { createAuthClient } from "better-auth/react";
 import { publicEnv } from "@/lib/env/public";
 
 /** Fields the API adds to the user (backend/src/config/auth/better-auth.ts). */
-const userFields = {
-  role: { type: "string", required: true, input: true },
-  status: { type: "string", required: false, input: false },
-} as const;
+type UserFields = {
+  role: { type: "string"; required: true; input: true };
+  status: { type: "string"; required: false; input: false };
+};
 
-type AdditionalFields = ReturnType<typeof inferAdditionalFields<unknown, { user: typeof userFields }>>;
+type AdditionalFields = ReturnType<typeof inferAdditionalFields<unknown, { user: UserFields }>>;
 
 /**
  * The additional-fields client plugin is a type-level marker; at runtime it is this object.

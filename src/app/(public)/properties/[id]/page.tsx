@@ -163,7 +163,7 @@ async function PropertyView({ params }: { params: PageProps<"/properties/[id]">[
         <header className="grid gap-4">
           <div className="on-board flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-sm bg-board px-4 py-3 text-on-board">
             <p className="board-type flex items-center gap-2 text-step-4">
-              <MapPin aria-hidden className="size-6 text-band" />
+              <MapPin aria-hidden className="size-6 text-on-board-2" />
               {p.area}
             </p>
             <p className="text-on-board-2">{p.county} County</p>

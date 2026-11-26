@@ -58,57 +58,41 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="on-board sticky top-0 z-40 border-b border-board-line bg-board text-on-board">
+    <header className="sticky top-0 z-40 border-b border-line bg-ground text-ink">
       <div className="wrap flex h-(--header-h) items-center gap-4">
         <Link href={role ? ROLE_HOME[role] : "/"} className="shrink-0 rounded-xs" aria-label="KejaLink home">
           <Wordmark />
         </Link>
 
-        <nav aria-label="Main" className="ml-4 hidden items-center gap-5 md:flex">
+        <nav aria-label="Main" className="ml-6 hidden items-center gap-6 md:flex">
           {nav.map((item) => (
-            <span
-              key={item.href}
-              className="[&_a]:text-on-board-2 [&_a:hover]:text-on-board [&_a[aria-current=page]]:text-on-board"
-            >
-              <NavLink item={item} />
-            </span>
+            <NavLink key={item.href} item={item} />
           ))}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
           {isPending ? (
-            <span aria-hidden className="h-9 w-24 rounded-sm bg-board-2" />
+            <span aria-hidden className="h-9 w-24 rounded-sm bg-sunk" />
           ) : user && role ? (
             <div className="hidden items-center gap-3 md:flex">
               <Link
                 href={`${ROLE_HOME[role]}/account`}
-                className="inline-flex min-h-11 items-center gap-2 rounded-sm px-2 text-on-board-2 hover:text-on-board"
+                className="inline-flex min-h-11 items-center gap-2 rounded-sm px-2 text-ink-2 hover:text-ink"
               >
                 <Avatar name={user.name} size="sm" />
-                <span className="max-w-[12ch] truncate font-bold text-on-board">
-                  {user.name.split(" ")[0]}
-                </span>
+                <span className="max-w-[12ch] truncate font-medium text-ink">{user.name.split(" ")[0]}</span>
               </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-on-board-2 hover:bg-board-2 hover:text-on-board"
-                onClick={signOut}
-              >
+              <Button variant="ghost" size="sm" className="text-ink-2 hover:text-ink" onClick={signOut}>
                 <LogOut aria-hidden />
                 Sign out
               </Button>
             </div>
           ) : (
             <div className="hidden items-center gap-2 md:flex">
-              <Button asChild variant="ghost" size="sm" className="text-on-board hover:bg-board-2">
+              <Button asChild variant="ghost" size="sm">
                 <Link href="/login">Sign in</Link>
               </Button>
-              <Button
-                asChild
-                size="sm"
-                className="border-board-line bg-board-2 text-on-board hover:border-band hover:bg-board"
-              >
+              <Button asChild variant="secondary" size="sm">
                 <Link href="/register?as=tenant">List a place</Link>
               </Button>
             </div>
@@ -118,7 +102,7 @@ export function SiteHeader() {
           {!isPending && !user ? (
             <Link
               href="/login"
-              className="inline-flex min-h-11 items-center px-2 font-bold text-on-board underline-offset-4 hover:underline md:hidden"
+              className="inline-flex min-h-11 items-center px-2 font-medium text-ink underline-offset-4 hover:underline md:hidden"
             >
               Sign in
             </Link>
@@ -127,7 +111,7 @@ export function SiteHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-on-board hover:bg-board-2 md:hidden"
+            className="md:hidden"
             aria-haspopup="dialog"
             aria-expanded={open}
             onClick={() => {
@@ -157,23 +141,23 @@ export function SiteHeader() {
 /** Static stand-in while the header (which reads the URL and session) streams in. Same size, no shift. */
 export function SiteHeaderFallback() {
   return (
-    <header className="on-board sticky top-0 z-40 border-b border-board-line bg-board text-on-board">
+    <header className="sticky top-0 z-40 border-b border-line bg-ground text-ink">
       <div className="wrap flex h-(--header-h) items-center gap-4">
         <Link href="/" className="shrink-0 rounded-xs" aria-label="KejaLink home">
           <Wordmark />
         </Link>
-        <nav aria-label="Main" className="ml-4 hidden items-center gap-5 md:flex">
+        <nav aria-label="Main" className="ml-6 hidden items-center gap-6 md:flex">
           {PUBLIC_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="inline-flex min-h-11 items-center px-1 font-bold text-on-board-2"
+              className="inline-flex min-h-11 items-center px-1 font-medium text-ink-2"
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <span aria-hidden className="ml-auto h-9 w-24 rounded-sm bg-board-2" />
+        <span aria-hidden className="ml-auto h-9 w-24 rounded-sm bg-sunk" />
       </div>
     </header>
   );

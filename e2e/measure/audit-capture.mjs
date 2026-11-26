@@ -50,7 +50,7 @@ const b = await mk("One-bedroom off Ngong Road", "Kilimani", 26000, "APARTMENT")
 const c = await mk("Studio near Kenyatta Market", "Kilimani", 18000, "STUDIO");
 
 const seeker = await account("SEEKER", "Otieno Wafula");
-const bk1 = (
+void (
   await api(seeker, "POST", "/bookings", { propertyId: a.id, message: "Hi, I can view on Saturday morning." })
 ).data;
 const bk2 = (await api(seeker, "POST", "/bookings", { propertyId: b.id, preferredMoveInDate: "2026-12-15" }))

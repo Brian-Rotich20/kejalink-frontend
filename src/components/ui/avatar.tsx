@@ -21,7 +21,7 @@ export function Avatar({
     <span
       aria-hidden
       className={cn(
-        "board-type-wide inline-grid shrink-0 place-items-center rounded-sm bg-board text-band",
+        "inline-grid shrink-0 place-items-center rounded-sm bg-forest-soft font-semibold text-forest",
         size === "sm" && "size-8 text-[0.8rem]",
         size === "md" && "size-11 text-step-0",
         size === "lg" && "size-14 text-step-2",

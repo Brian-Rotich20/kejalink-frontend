@@ -24,7 +24,7 @@ export function StateBlock({
     <div
       className={cn(
         "grid justify-items-start gap-3 rounded-md border p-6 md:p-8",
-        tone === "neutral" && "border-dashed border-line-strong bg-surface",
+        tone === "neutral" && "border-line bg-paper",
         tone === "danger" && "border-danger/40 bg-danger-soft",
         tone === "warning" && "border-warning/40 bg-warning-soft",
         className,
@@ -39,7 +39,7 @@ export function StateBlock({
           )}
         />
       ) : null}
-      <Heading className="board-type text-step-3">{title}</Heading>
+      <Heading className="headline text-step-3">{title}</Heading>
       {children ? <div className="measure grid gap-2 text-ink-2">{children}</div> : null}
       {action ? <div className="mt-1 flex flex-wrap gap-3">{action}</div> : null}
     </div>

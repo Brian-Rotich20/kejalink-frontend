@@ -1,34 +1,33 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Atkinson_Hyperlegible_Next } from "next/font/google";
+import { DM_Sans, Newsreader } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import { Suspense } from "react";
 import { SiteHeader, SiteHeaderFallback } from "@/components/layout/site-header";
 import { siteUrl } from "@/lib/env/public";
 import "./globals.css";
 
-/** Route-board lettering: condensed via the wdth axis. */
-const board = Archivo({
+/** Editorial headings and selected statements: optical sizes 6–72 follow the set size. */
+const editorial = Newsreader({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-board",
+  axes: ["opsz"],
+  style: ["normal", "italic"],
+  variable: "--font-editorial",
   display: "swap",
 });
 
-/** Everything that is read. */
-const text = Atkinson_Hyperlegible_Next({
+/** Interface text, labels, figures. */
+const text = DM_Sans({
   subsets: ["latin"],
+  axes: ["opsz"],
   variable: "--font-text",
   display: "swap",
-  // next/font has no metrics for the "Next" cut; a hand-tuned fallback (globals.css) prevents layout shift.
-  adjustFontFallback: false,
-  fallback: ["Atkinson Fallback", "system-ui", "sans-serif"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "KejaLink · Tafuta keja yako",
-    template: "%s · KejaLink",
+    default: "KejaLink: places to rent in Nairobi",
+    template: "%s | KejaLink",
   },
   description:
     "Find a real place to rent in Nairobi. Request a viewing, get a clear yes or no from the person listing, and pay only after you've seen the house.",
@@ -43,7 +42,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#100f0d",
+  themeColor: "#f1ede4",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -51,7 +50,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-KE" className={`${board.variable} ${text.variable}`}>
+    <html lang="en-KE" className={`${editorial.variable} ${text.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <a href="#main" className="skip-link">
           Skip to content

@@ -8,7 +8,7 @@ import { formatAmount } from "@/lib/format";
 import { BUDGET_STEPS, COUNTIES, PROPERTY_TYPE_LABEL, PROPERTY_TYPES, type PropertyType } from "@/lib/kenya";
 
 const boardField =
-  "block w-full min-h-12 rounded-sm border border-board-line bg-board-2 px-3 text-on-board placeholder:text-on-board-2/80 " +
+  "block w-full min-h-12 rounded-sm border border-board-line bg-board-2 px-3 text-on-board placeholder:text-on-board-2 " +
   "transition-colors hover:border-on-board-2 focus-visible:border-band focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-band";
 
 const selectChevron =

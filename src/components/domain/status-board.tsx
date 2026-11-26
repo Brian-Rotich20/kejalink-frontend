@@ -29,7 +29,7 @@ function Row({ row }: { row: BoardRow }) {
         href={row.href}
         className={cn(
           "group flex min-h-16 items-center gap-4 px-4 py-3 transition-colors hover:bg-board-2 focus-visible:bg-board-2",
-          hot && "text-band",
+          hot && "underline decoration-2 underline-offset-4",
         )}
       >
         <span className="board-type-wide flex-1 text-step-0">{row.label}</span>
@@ -49,7 +49,9 @@ function Row({ row }: { row: BoardRow }) {
 export function StatusBoard({ title, rows }: { title: string; rows: BoardRow[] }) {
   return (
     <section aria-label={title} className="on-board overflow-hidden rounded-md bg-board text-on-board">
-      <h2 className="board-type-wide border-b border-board-line px-4 py-3 text-step--1 text-band">{title}</h2>
+      <h2 className="board-type-wide border-b border-board-line px-4 py-3 text-step--1 text-on-board-2">
+        {title}
+      </h2>
       <ul className="divide-y divide-board-line">
         {rows.map((row) => (
           <Row key={row.label} row={row} />

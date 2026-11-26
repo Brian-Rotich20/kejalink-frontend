@@ -16,7 +16,7 @@ export function SiteFooter() {
       <div aria-hidden className="band-rule" />
       <div className="wrap grid gap-10 py-12 md:grid-cols-[1fr_auto] md:items-end">
         <div className="grid gap-4">
-          <Wordmark />
+          <Wordmark tone="light" />
           <p className="measure text-on-board-2">
             Real places to rent in Kenya, starting in Nairobi. Pay only after you&apos;ve viewed the house.
           </p>

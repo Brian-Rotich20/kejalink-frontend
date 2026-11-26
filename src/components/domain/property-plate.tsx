@@ -102,7 +102,7 @@ export function PropertyPlate({
       <PhotoFrame src={property.primaryImageUrl} alt="" sizes={sizes} priority={priority} />
       {/* The route board: where it is, what it costs, whether there is room. */}
       <div className="on-board grid gap-2 bg-board px-4 py-3 text-on-board">
-        <div className="flex items-baseline justify-between gap-3">
+        <div className="flex min-w-0 items-baseline justify-between gap-3">
           <p className="board-type min-w-0 truncate text-step-2">{property.area}</p>
           <p className="board-type shrink-0 text-step-2 whitespace-nowrap">
             <span className="sr-only">Rent: </span>
@@ -111,7 +111,7 @@ export function PropertyPlate({
             <span className="sr-only"> a month</span>
           </p>
         </div>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center justify-between gap-3">
           <AvailabilityPlate available={property.isAvailable} ground="board" />
           <p aria-hidden className="text-step--1 text-on-board-2">
             per month

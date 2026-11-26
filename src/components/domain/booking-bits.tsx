@@ -132,7 +132,7 @@ export function BookingTimeline({ booking }: { booking: Booking }) {
             aria-hidden
             className={cn(
               "grid size-7 place-items-center rounded-pill border-2",
-              step.done ? "border-ink bg-ink text-band" : "border-dashed border-line-strong bg-surface-2",
+              step.done ? "border-ink bg-ink text-paper" : "border-dashed border-line-strong bg-surface-2",
             )}
           >
             {step.done ? <Check className="size-4" strokeWidth={3} /> : null}

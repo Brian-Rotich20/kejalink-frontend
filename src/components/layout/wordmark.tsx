@@ -1,19 +1,28 @@
 import { cn } from "@/lib/cn";
 
-/** Set type until a real logo exists: two route-board plates, band and ink. */
-export function Wordmark({ className, size = "md" }: { className?: string; size?: "md" | "lg" }) {
+/**
+ * The masthead: the name set in Newsreader, like a publication's nameplate. A wordmark only
+ * (no invented logo) until the owner supplies one. `tone="light"` is for forest/charcoal grounds.
+ */
+export function Wordmark({
+  className,
+  size = "md",
+  tone = "forest",
+}: {
+  className?: string;
+  size?: "md" | "lg";
+  tone?: "forest" | "light";
+}) {
   return (
     <span
       className={cn(
-        "board-type inline-flex items-stretch leading-none",
-        size === "md" ? "text-[1.375rem]" : "text-step-4",
+        "font-serif font-semibold tracking-[-0.02em] [font-optical-sizing:auto]",
+        size === "md" ? "text-[1.6rem] leading-none" : "text-step-5 leading-none",
+        tone === "forest" ? "text-forest" : "text-on-forest",
         className,
       )}
     >
-      <span className="rounded-l-xs bg-band px-[0.3em] pt-[0.16em] pb-[0.1em] text-on-band">Keja</span>
-      <span className="rounded-r-xs bg-board px-[0.3em] pt-[0.16em] pb-[0.1em] text-band ring-1 ring-board-line ring-inset">
-        Link
-      </span>
+      KejaLink
     </span>
   );
 }

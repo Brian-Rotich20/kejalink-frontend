@@ -4,36 +4,44 @@ import { Slot } from "radix-ui";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
+const primary = "bg-forest text-on-forest hover:bg-forest-hover active:bg-forest-press";
+const secondary = "border border-line-strong bg-paper text-ink hover:border-ink";
+
 export const buttonVariants = cva(
   [
-    "relative inline-flex items-center justify-center gap-2 font-bold whitespace-nowrap select-none",
-    "rounded-sm transition-[background-color,border-color,color,transform,box-shadow] duration-(--dur-1) ease-out",
-    "hover:-translate-y-px active:translate-y-px active:scale-[0.98] motion-reduce:transform-none",
-    "disabled:pointer-events-none disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:opacity-55",
-    "[&_svg]:size-[1.15em] [&_svg]:shrink-0",
+    "relative inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none",
+    "rounded-sm transition-[background-color,border-color,color,scale] duration-(--dur-1) ease-out",
+    "active:scale-[0.98] motion-reduce:active:scale-100",
+    "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
+    "[&_svg]:size-[1.1em] [&_svg]:shrink-0",
   ],
   {
     variants: {
       variant: {
-        /** The one primary action in a region: the PSV band. */
-        band: "bg-band text-on-band hover:bg-band-hover active:bg-band-press",
-        /** Route-board ink. */
-        board: "bg-board text-on-board hover:bg-board-2",
-        quiet: "border border-line-strong bg-surface-2 text-ink hover:border-ink hover:bg-surface",
-        ghost: "text-ink hover:bg-surface-sunk",
-        danger: "bg-danger text-white hover:brightness-95",
+        /** The main action in a region: forest. */
+        primary,
+        /** Everything else that matters: an ivory button with a firm outline. */
+        secondary,
+        ghost: "text-ink hover:bg-sunk",
+        danger: "bg-danger text-paper hover:brightness-95",
         "danger-quiet":
-          "border border-danger/50 bg-surface-2 text-danger hover:border-danger hover:bg-danger-soft",
+          "border border-danger/45 bg-paper text-danger hover:border-danger hover:bg-danger-soft",
+        /** @deprecated transitional alias of `primary` */
+        band: primary,
+        /** @deprecated transitional alias of `secondary` */
+        board: secondary,
+        /** @deprecated transitional alias of `secondary` */
+        quiet: secondary,
       },
       size: {
         sm: "min-h-11 px-3 text-step--1 md:min-h-9",
         md: "min-h-11 px-4 text-step-0",
-        lg: "min-h-13 px-6 text-step-1",
+        lg: "min-h-12 px-5 text-step-0",
         icon: "size-11 p-0",
       },
       block: { true: "w-full" },
     },
-    defaultVariants: { variant: "quiet", size: "md" },
+    defaultVariants: { variant: "secondary", size: "md" },
   },
 );
 
