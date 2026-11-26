@@ -3,10 +3,10 @@ import { useId } from "react";
 import { cn } from "@/lib/cn";
 
 const control =
-  "block w-full min-h-11 rounded-sm border border-line-strong bg-surface-2 px-3 text-ink placeholder:text-ink-3 " +
-  "transition-[border-color,box-shadow] duration-(--dur-1) hover:border-ink focus-visible:border-focus " +
+  "block w-full min-h-11 rounded-sm border border-line-strong bg-paper px-3 text-ink placeholder:text-ink-3 " +
+  "transition-[border-color] duration-(--dur-1) hover:border-ink-2 focus-visible:border-forest " +
   "focus-visible:outline-2 focus-visible:outline-offset-0 aria-invalid:border-danger aria-invalid:outline-danger " +
-  "disabled:cursor-not-allowed disabled:bg-surface-sunk disabled:text-ink-3";
+  "disabled:cursor-not-allowed disabled:bg-sunk disabled:text-ink-3";
 
 export const controlClass = control;
 
@@ -15,7 +15,7 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
 }
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
-  return <textarea className={cn(control, "min-h-28 py-2.5 leading-relaxed", className)} {...props} />;
+  return <textarea className={cn(control, "min-h-28 py-3 leading-relaxed", className)} {...props} />;
 }
 
 export function NativeSelect({ className, children, ...props }: ComponentProps<"select">) {
@@ -24,7 +24,7 @@ export function NativeSelect({ className, children, ...props }: ComponentProps<"
       className={cn(
         control,
         "appearance-none bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat pr-10",
-        "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23252a36' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
+        "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b2622' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
         className,
       )}
       {...props}
@@ -52,7 +52,7 @@ export function Field({ label, hint, error, optional, className, children }: Fie
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
   return (
     <div className={cn("grid gap-1.5", className)}>
-      <label htmlFor={id} className="font-bold text-ink">
+      <label htmlFor={id} className="font-medium text-ink">
         {label}
         {optional ? <span className="ml-1.5 font-normal text-ink-3">(optional)</span> : null}
       </label>
@@ -63,7 +63,7 @@ export function Field({ label, hint, error, optional, className, children }: Fie
       ) : null}
       {children({ id, describedBy, invalid: Boolean(error) })}
       {error ? (
-        <p id={errorId} className="text-step--1 font-bold text-danger">
+        <p id={errorId} className="text-step--1 font-medium text-danger">
           {error}
         </p>
       ) : null}

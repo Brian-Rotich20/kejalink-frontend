@@ -60,23 +60,44 @@ export const UserStatusPlate = ({ status, className }: { status: UserStatus; cla
   <StatusPlate tone={USER_STATUS[status]} className={className} />
 );
 
-/** A taken place stays visible, plated "Taken", instead of vanishing. */
-export function AvailabilityPlate({ available, className }: { available: boolean; className?: string }) {
+/**
+ * A taken place stays visible, plated "Taken", instead of vanishing. Filled dot = room;
+ * hollow dot = full. `ground="board"` is for plates set on an ink route board.
+ */
+export function AvailabilityPlate({
+  available,
+  className,
+  ground = "light",
+}: {
+  available: boolean;
+  className?: string;
+  ground?: "light" | "board";
+}) {
+  const tone =
+    ground === "board"
+      ? available
+        ? "bg-on-board text-board"
+        : "text-on-board-2 ring-1 ring-board-line"
+      : available
+        ? "bg-surface-2 text-ink ring-1 ring-ink"
+        : "bg-board text-on-board";
+  const dot =
+    ground === "board"
+      ? available
+        ? "bg-board"
+        : "border border-on-board-2"
+      : available
+        ? "bg-ink"
+        : "border border-on-board-2";
   return (
     <span
       className={cn(
-        "board-type-wide inline-flex items-center gap-1.5 rounded-xs px-2 py-1 text-[0.8125rem] leading-none",
-        available ? "bg-band text-on-band" : "bg-board text-on-board",
+        "board-type-wide inline-flex items-center gap-1.5 rounded-xs px-2 py-1 text-[0.8125rem] leading-none whitespace-nowrap",
+        tone,
         className,
       )}
     >
-      <span
-        aria-hidden
-        className={cn(
-          "size-2 rounded-pill",
-          available ? "bg-on-band" : "border border-on-board-2 bg-transparent",
-        )}
-      />
+      <span aria-hidden className={cn("size-2 rounded-pill", dot)} />
       {available ? "Available" : "Taken"}
     </span>
   );

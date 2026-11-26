@@ -136,3 +136,9 @@ export async function forward(request: Request, options: ForwardOptions): Promis
     headers: responseHeaders,
   });
 }
+
+/** Writes that can change what public listing pages show (details, photos, availability, moderation). */
+export function affectsListings(method: string, pathname: string): boolean {
+  if (method === "GET" || method === "HEAD") return false;
+  return /^\/api\/(properties|bookings|admin\/(properties|users))(\/|$)/.test(pathname);
+}

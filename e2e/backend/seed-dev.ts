@@ -1,5 +1,5 @@
 /**
- * DEV FIXTURES — local development only. Creates a few listings on the LOCAL e2e API so the UI
+ * SAMPLE LISTINGS — local development only. Creates a few authored listings on the LOCAL e2e API so the UI
  * can be reviewed with content. Refuses any API that is not on localhost. Never bundled; never
  * run against production.
  *
@@ -45,31 +45,47 @@ async function signUp(name: string, email: string, role: "TENANT" | "SEEKER") {
 }
 
 const LISTINGS = [
-  ["Bedsitter two minutes from KU main gate", "BEDSITTER", 9500, 0, 1, "Kiambu", "Kahawa Wendani"],
-  ["Spacious one-bedroom with balcony", "APARTMENT", 28000, 1, 1, "Nairobi", "Kilimani"],
-  ["Single room for a student, shared kitchen", "ROOM", 6500, 0, 1, "Nairobi", "Ngara"],
-  ["Studio with fitted kitchen near Yaya", "STUDIO", 22000, 0, 1, "Nairobi", "Kilimani"],
-  ["Two-bedroom in a gated compound", "APARTMENT", 42000, 2, 2, "Nairobi", "South B"],
-  ["Bedsitter with 24/7 water, near the stage", "BEDSITTER", 8000, 0, 1, "Nairobi", "Roysambu"],
-  ["Three-bedroom house with parking", "HOUSE", 65000, 3, 2, "Kiambu", "Ruaka"],
-  ["One-bedroom near UoN Chiromo", "APARTMENT", 25000, 1, 1, "Nairobi", "Westlands"],
+  ["Bedsitter two minutes from the KU main gate", "BEDSITTER", 9500, 0, 1, "Kiambu", "Kahawa Wendani", true],
+  ["One-bedroom with a balcony off Argwings Kodhek", "APARTMENT", 28000, 1, 1, "Nairobi", "Kilimani", true],
+  ["Single room for a student, shared kitchen", "ROOM", 6500, 0, 1, "Nairobi", "Ngara", false],
+  ["Studio with a fitted kitchen near Yaya Centre", "STUDIO", 22000, 0, 1, "Nairobi", "Kilimani", true],
+  ["Two-bedroom in a gated compound", "APARTMENT", 42000, 2, 2, "Nairobi", "South B", true],
+  ["Bedsitter with water 24/7, near the stage", "BEDSITTER", 8000, 0, 1, "Nairobi", "Roysambu", true],
 ] as const;
 
+/**
+ * Photos for local review only, downloaded at seed time (never committed or shipped). Unsplash
+ * licence; credits: Cytonn Photography (Nairobi), deborah cortelazzi, Patrick Perkins, Clay Banks,
+ * Naomi Hébert, Frames For Your Heart. Production listings carry only their listers' own photos.
+ */
+const PHOTOS = [
+  "1658218635253-64728f6234be",
+  "1658218729615-167c32d70537",
+  "1522708323590-d24dbb6b0267",
+  "1502672260266-1c1ef2d93688",
+  "1773578978637-c9771e7a9913",
+  "1484154218962-a197022b5858",
+  "1512918728675-ed5a9ecdebfd",
+].map((id) => `https://images.unsplash.com/photo-${id}?w=1600&q=80&fm=jpg`);
+
+/**
+ * Authored sample listings for local review only, labelled as samples in their descriptions.
+ * No photos: stand-in pictures of other places would misrepresent a listing; the designed
+ * "No photo yet" state shows instead. One sample is marked taken to show that state.
+ */
 async function main() {
-  const cookie = await signUp("Dev Fixture Lister", "dev-lister@e2e.kejalink.test", "TENANT");
-  const photo = new Blob(
-    [await (await fetch("https://res.cloudinary.com/demo/image/upload/w_600/sample.jpg")).arrayBuffer()],
-    {
-      type: "image/jpeg",
-    },
+  const cookie = await signUp("Sample Lister", "sample-lister@e2e.kejalink.test", "TENANT");
+  const photos = await Promise.all(
+    PHOTOS.map(async (url) => new Blob([await (await fetch(url)).arrayBuffer()], { type: "image/jpeg" })),
   );
-  for (const [title, propertyType, priceAmount, bedrooms, bathrooms, county, area] of LISTINGS) {
+  let shot = 0;
+  for (const [index, [title, propertyType, priceAmount, bedrooms, bathrooms, county, area, available]] of LISTINGS.entries()) {
     const { body } = await call("/properties", {
       method: "POST",
       cookie,
       body: {
         title,
-        description: `DEV FIXTURE. ${title}. Water and token electricity, secure compound, close to matatu stage and shops.`,
+        description: `Sample listing for local development. ${title}. Water and token electricity, secure compound, close to the matatu stage and shops.`,
         propertyType,
         priceAmount,
         bedrooms,
@@ -80,11 +96,17 @@ async function main() {
       },
     });
     const id = (body.data as { id: string }).id;
-    for (let i = 0; i < 2; i += 1) {
-      const form = new FormData();
-      form.append("file", photo, "photo.jpg");
-      await call(`/properties/${id}/uploads`, { method: "POST", cookie, body: form });
+    // Every listing but the last gets two or three photos; the last shows the no-photo state.
+    if (index < LISTINGS.length - 1) {
+      for (let i = 0; i < 2 + (index % 2); i += 1) {
+        const form = new FormData();
+        form.append("file", photos[shot % photos.length] as Blob, "photo.jpg");
+        shot += 1;
+        await call(`/properties/${id}/uploads`, { method: "POST", cookie, body: form });
+      }
     }
+    if (!available)
+      await call(`/properties/${id}`, { method: "PATCH", cookie, body: { isAvailable: false } });
     console.log(`seeded ${area}: ${title}`);
   }
 }

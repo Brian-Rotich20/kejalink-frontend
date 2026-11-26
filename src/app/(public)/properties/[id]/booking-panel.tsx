@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, CircleCheck, Lock, Pencil, ShieldAlert, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { ApiError, messageFor } from "@/lib/api/errors";
-import { createBooking } from "@/lib/api/resources";
+import { createBooking, getProperty, keys } from "@/lib/api/resources";
 import type { Booking } from "@/lib/api/schemas/booking";
 import { useSession } from "@/lib/auth/client";
 import { loginHref } from "@/lib/auth/roles";
@@ -219,8 +219,24 @@ function PanelBody(props: Props & { onSent: (b: Booking) => void; sent: Booking 
  * Desktop: a sticky side column. Phones: a bar fixed in thumb reach with the rent and the action,
  * opening the same panel as a bottom sheet.
  */
-export function BookingPanel(props: Props) {
+export function BookingPanel(initialProps: Props) {
   const [sent, setSent] = useState<Booking | null>(null);
+  // The page may come from a short-lived cache: re-check availability live, so a place that was
+  // just confirmed for someone else never offers a request button.
+  const live = useQuery({
+    queryKey: keys.property(initialProps.propertyId),
+    queryFn: () => getProperty(initialProps.propertyId),
+    staleTime: 0,
+    retry: 1,
+  });
+  const fresh = live.data?.data;
+  const props: Props = fresh
+    ? {
+        ...initialProps,
+        isAvailable: fresh.isAvailable && fresh.status === "PUBLISHED",
+        priceAmount: fresh.priceAmount,
+      }
+    : initialProps;
   const [sheet, setSheet] = useState(false);
   const body = <PanelBody {...props} sent={sent} onSent={setSent} />;
   const price = (compact: boolean) => (

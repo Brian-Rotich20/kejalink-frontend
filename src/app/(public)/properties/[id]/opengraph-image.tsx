@@ -15,7 +15,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   let property = null;
   if (isUuid(id)) {
     try {
-      property = (await getPublicProperty(id)).data;
+      property = await getPublicProperty(id);
     } catch {
       property = null;
     }

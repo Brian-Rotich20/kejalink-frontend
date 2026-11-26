@@ -1,252 +1,295 @@
-import { ArrowRight, CircleCheck, Clock, KeyRound, MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { ListingSearch } from "@/components/domain/listing-search";
 import { PropertyPlate, PropertyPlateSkeleton } from "@/components/domain/property-plate";
-import { RouteBoardSearch } from "@/components/domain/route-board-search";
-import { BookingStatusPlate } from "@/components/domain/status";
 import { WakingNotice } from "@/components/layout/waking";
 import { Button } from "@/components/ui/button";
 import { getNewestListings } from "@/lib/api/public-data";
+import type { PropertyListItem } from "@/lib/api/schemas/property";
+import { plural } from "@/lib/format";
 
-async function NewestListings() {
+/**
+ * Group the newest listings by neighbourhood: the busiest areas first, most recent breaking ties.
+ * Counts are the real number of listings in this batch, never an estimate.
+ */
+function byNeighbourhood(listings: PropertyListItem[], maxAreas = 2, maxElsewhere = 6) {
+  const keyOf = (l: PropertyListItem) => `${l.area.trim().toLowerCase()}|${l.county}`;
+  const groups = new Map<string, PropertyListItem[]>();
+  for (const listing of listings)
+    groups.set(keyOf(listing), [...(groups.get(keyOf(listing)) ?? []), listing]);
+  // A section needs at least two places; a single listing would leave the side column empty.
+  const sections = [...groups.values()]
+    .filter((group) => group.length >= 2)
+    .sort((a, b) => b.length - a.length || (b[0]?.createdAt ?? "").localeCompare(a[0]?.createdAt ?? ""))
+    .slice(0, maxAreas);
+  const inSection = new Set(sections.map((group) => keyOf(group[0] as PropertyListItem)));
+  const rest = listings.filter((l) => !inSection.has(keyOf(l)));
+  // Whole rows of three on wide screens; the full list is one click away.
+  const count = rest.length >= 3 ? Math.min(maxElsewhere, rest.length - (rest.length % 3)) : rest.length;
+  const elsewhere = rest.slice(0, count);
+  return { sections, elsewhere };
+}
+
+function Elsewhere({
+  listings,
+  first,
+  titled,
+}: {
+  listings: PropertyListItem[];
+  first: boolean;
+  titled: boolean;
+}) {
+  if (listings.length === 0) return null;
+  return (
+    <section aria-labelledby="elsewhere-title" className="grid gap-6 border-t border-line pt-6 md:pt-8">
+      <h3 id="elsewhere-title" className={titled ? "headline text-step-4" : "sr-only"}>
+        Elsewhere in Nairobi
+      </h3>
+      <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        {listings.map((listing, i) => (
+          <li key={listing.id}>
+            <PropertyPlate
+              property={listing}
+              priority={first && i < 3}
+              sizes="(min-width: 1200px) 384px, (min-width: 640px) 50vw, 100vw"
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Neighbourhood({ listings, first }: { listings: PropertyListItem[]; first: boolean }) {
+  const [lead, ...rest] = listings;
+  if (!lead) return null;
+  const area = lead.area.trim();
+  const href = `/properties?area=${encodeURIComponent(area)}`;
+  return (
+    <section aria-labelledby={`area-${lead.id}`} className="grid gap-6 border-t border-line pt-6 md:pt-8">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <h3 id={`area-${lead.id}`} className="headline text-step-4">
+          {area}
+          <span className="ml-3 font-sans text-step-0 font-normal tracking-normal text-ink-3">
+            {lead.county}
+          </span>
+        </h3>
+        <Link href={href} className="link text-step--1">
+          {listings.length > 1 ? `All ${plural(listings.length, "new place")} in ${area}` : `More in ${area}`}
+        </Link>
+      </div>
+      {rest.length === 1 ? (
+        <ul className="grid gap-x-6 gap-y-10 md:grid-cols-2">
+          {listings.map((listing, i) => (
+            <li key={listing.id}>
+              <PropertyPlate
+                property={listing}
+                showArea={false}
+                priority={first && i === 0}
+                sizes="(min-width: 1200px) 580px, (min-width: 768px) 50vw, 100vw"
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul className="grid gap-x-6 gap-y-10 md:grid-cols-12">
+          <li className="md:col-span-8 md:row-span-2">
+            <PropertyPlate
+              property={lead}
+              variant="lead"
+              showArea={false}
+              priority={first}
+              sizes="(min-width: 1200px) 760px, (min-width: 768px) 66vw, 100vw"
+            />
+          </li>
+          {rest.slice(0, 2).map((listing) => (
+            <li key={listing.id} className="md:col-span-4 md:col-start-9">
+              <PropertyPlate
+                property={listing}
+                showArea={false}
+                sizes="(min-width: 1200px) 370px, (min-width: 768px) 33vw, 100vw"
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+async function Neighbourhoods() {
   await connection();
-  let listings;
+  let listings: PropertyListItem[];
   try {
-    listings = (await getNewestListings(6)).data;
+    listings = (await getNewestListings(12)).data;
   } catch {
     return (
-      <div className="grid gap-3 rounded-md border border-line bg-surface-2 p-6">
-        <p className="font-bold">We couldn&apos;t load the newest places just now.</p>
+      <div className="grid justify-items-start gap-3 border-t border-line pt-6">
+        <p className="font-medium">The newest places didn&apos;t load just now.</p>
         <p className="text-ink-2">The search above still works, or try again in a minute.</p>
-        <div>
-          <Button asChild>
-            <Link href="/properties">Browse all places</Link>
-          </Button>
-        </div>
+        <Button asChild>
+          <Link href="/properties">Browse all places</Link>
+        </Button>
       </div>
     );
   }
 
   if (listings.length === 0) {
     return (
-      <div className="grid gap-4 rounded-md border border-dashed border-line-strong p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
-        <div className="grid gap-2">
-          <p className="board-type text-step-3">The stage is quiet right now</p>
-          <p className="measure text-ink-2">
-            KejaLink is new in Nairobi and the first places are on their way. If you have a room, bedsitter or
-            house to let, yours can be the first one up.
+      <div className="grid gap-4 border-t border-line pt-6 md:grid-cols-12 md:gap-6">
+        <p className="headline text-step-3 md:col-span-7">
+          KejaLink is new in Nairobi, and the first places are on their way.
+        </p>
+        <div className="grid content-start justify-items-start gap-4 md:col-span-5">
+          <p className="text-ink-2">
+            If you have a room, bedsitter or house to let, yours can be among the first. People looking in
+            your area will see it the day you list it.
           </p>
+          <Button asChild variant="primary">
+            <Link href="/register?as=tenant">List your place</Link>
+          </Button>
         </div>
-        <Button asChild variant="board" size="lg">
-          <Link href="/register?as=tenant">List your place</Link>
-        </Button>
       </div>
     );
   }
 
+  const { sections, elsewhere } = byNeighbourhood(listings);
   return (
-    <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {listings.map((property, index) => (
-        <li key={property.id} className="grid">
-          <PropertyPlate property={property} index={index} />
-        </li>
+    <div className="grid gap-12 md:gap-16">
+      {sections.map((group, index) => (
+        <Neighbourhood key={group[0]?.id} listings={group} first={index === 0} />
       ))}
-    </ul>
-  );
-}
-
-function NewestFallback() {
-  return (
-    <div className="grid gap-4">
-      <WakingNotice />
-      <ul aria-hidden className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <li key={i}>
-            <PropertyPlateSkeleton />
-          </li>
-        ))}
-      </ul>
+      <Elsewhere listings={elsewhere} first={sections.length === 0} titled={sections.length > 0} />
     </div>
   );
 }
 
-const SEEKER_STEPS = [
+function NeighbourhoodsFallback() {
+  return (
+    <div className="grid gap-6 border-t border-line pt-6">
+      <WakingNotice />
+      <div aria-hidden className="h-9 w-48 rounded-xs bg-sunk" />
+      <div className="grid gap-6 md:grid-cols-12">
+        <div className="md:col-span-8">
+          <PropertyPlateSkeleton />
+        </div>
+        <div className="hidden gap-6 md:col-span-4 md:grid">
+          <PropertyPlateSkeleton />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const STEPS = [
   {
-    title: "Search by area and budget",
-    body: "Pick the estate, campus or county and what you can pay. Every place shows its rent and whether it's still free.",
+    title: "Find a place",
+    body: "Search by area and budget. Every listing shows its monthly rent and whether it is still free.",
   },
   {
-    title: "Request a viewing",
-    body: "Say when you'd like to move in. Your request shows as Pending until the person listing answers.",
-    plate: "PENDING" as const,
+    title: "Ask to view it",
+    body: "Send a request with your move-in date. It stays pending until the person letting it answers.",
   },
   {
-    title: "Get a straight answer",
-    body: "Confirmed means it's yours to view, and you get their email to arrange it. Declined means move on, no ghosting.",
-    plate: "CONFIRMED" as const,
+    title: "Get a clear answer",
+    body: "Confirmed means you get their email to arrange a viewing. Declined means you can move on without waiting.",
   },
   {
     title: "View it, then pay",
-    body: "See the house with your own eyes before any money moves. That's the rule.",
-  },
-];
-
-const LISTER_STEPS = [
-  {
-    title: "List from your phone",
-    body: "Rent, area, type and photos straight from your camera. It takes a few minutes.",
-  },
-  {
-    title: "Requests come to you",
-    body: "Each one shows who's asking, their move-in date and their message.",
-  },
-  {
-    title: "Confirm one",
-    body: "The others are declined for you, and your place shows as Taken, so nobody chases a room that's gone.",
+    body: "See the house in person before any money changes hands. That is the rule on KejaLink.",
   },
 ];
 
 export default function LandingPage() {
   return (
     <>
-      {/* First viewport: the promise, then the route board you can use. */}
-      <section aria-labelledby="hero-title" className="wrap grid gap-6 pt-8 pb-10 md:gap-8 md:pt-14 md:pb-14">
-        <div className="grid gap-4">
-          <h1 id="hero-title" className="board-type text-step-6">
-            Tafuta keja yako.
+      <section aria-labelledby="hero-title" className="wrap grid gap-6 pt-8 pb-10 md:gap-8 md:pt-16 md:pb-14">
+        <div className="grid gap-4 md:grid-cols-12">
+          <h1 id="hero-title" className="display text-step-6 md:col-span-9">
+            Find a place to rent in Nairobi, from the people who let it.
           </h1>
-          <p className="measure text-step-1 text-ink-2">
-            Real places to rent in Nairobi, listed by the people who let them. Ask for a viewing, get a
-            straight yes or no, and pay nothing until you&apos;ve seen the house.
+          <p className="measure text-step-1 text-ink-2 md:col-span-7">
+            Tafuta keja yako. Ask to view a place, get a straight yes or no, and pay nothing until you have
+            seen the house.
           </p>
         </div>
-        <RouteBoardSearch />
+        <ListingSearch />
       </section>
 
-      <div className="bg-band text-on-band">
-        <p className="wrap flex items-center gap-3 py-3.5 font-bold">
-          <ShieldCheck aria-hidden className="size-5 shrink-0" />
-          Pay only after you&apos;ve viewed the house. Never send money to &ldquo;hold&rdquo; a place.
-        </p>
-      </div>
-
-      <section aria-labelledby="newest-title" className="wrap grid gap-6 py-14 md:py-20">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 id="newest-title" className="board-type text-step-4">
-            Just pulled in
+      <section aria-labelledby="new-title" className="wrap grid gap-8 pb-16 md:gap-10 md:pb-24">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+          <h2 id="new-title" className="headline text-step-3">
+            Newest places, by neighbourhood
           </h2>
-          <Link href="/properties" className="link inline-flex min-h-11 items-center gap-1.5 font-bold">
-            See all places
-            <ArrowRight aria-hidden className="size-4" />
+          <Link href="/properties" className="link">
+            Browse all places
           </Link>
         </div>
-        <Suspense fallback={<NewestFallback />}>
-          <NewestListings />
+        <Suspense fallback={<NeighbourhoodsFallback />}>
+          <Neighbourhoods />
         </Suspense>
       </section>
 
-      <div aria-hidden className="band-rule" />
-
-      <section aria-labelledby="how-title" className="wrap grid gap-10 py-14 md:py-20">
-        <div className="grid gap-3">
-          <h2 id="how-title" className="board-type text-step-4">
-            One request, one clear answer
-          </h2>
-          <p className="measure text-ink-2">
-            No calling ten numbers from a WhatsApp group. Every request has a status, and only one person gets
-            the place.
-          </p>
-        </div>
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="grid content-start gap-5">
-            <h3 className="flex items-center gap-2 text-step-1 font-bold">
-              <MapPin aria-hidden className="size-5" />
-              Looking for a place
-            </h3>
-            <ol className="grid gap-px overflow-hidden rounded-md border border-line bg-line">
-              {SEEKER_STEPS.map((step, i) => (
-                <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-3 bg-surface-2 p-4">
-                  <span aria-hidden className="board-type text-step-3 text-ink-3">
-                    {i + 1}
-                  </span>
-                  <div className="grid gap-1.5">
-                    <p className="flex flex-wrap items-center gap-2 font-bold">
-                      {step.title}
-                      {step.plate ? <BookingStatusPlate status={step.plate} /> : null}
-                    </p>
-                    <p className="text-ink-2">{step.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className="grid content-start gap-5">
-            <h3 className="flex items-center gap-2 text-step-1 font-bold">
-              <KeyRound aria-hidden className="size-5" />
-              Listing a place
-            </h3>
-            <ol className="grid gap-px overflow-hidden rounded-md border border-line bg-line">
-              {LISTER_STEPS.map((step, i) => (
-                <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-3 bg-surface-2 p-4">
-                  <span aria-hidden className="board-type text-step-3 text-ink-3">
-                    {i + 1}
-                  </span>
-                  <div className="grid gap-1.5">
-                    <p className="font-bold">{step.title}</p>
-                    <p className="text-ink-2">{step.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <Link href="/how-it-works" className="link inline-flex min-h-11 items-center gap-1.5 font-bold">
-              The full rules
-              <ArrowRight aria-hidden className="size-4" />
+      <section aria-labelledby="how-title" className="border-t border-line bg-paper">
+        <div className="wrap grid gap-10 py-16 md:grid-cols-12 md:gap-6 md:py-24">
+          <div className="grid content-start gap-3 md:col-span-4">
+            <h2 id="how-title" className="headline text-step-4">
+              How a request works
+            </h2>
+            <p className="text-ink-2">
+              One request, one answer, and only one person gets the place. Nobody chases a room that has gone.
+            </p>
+            <Link href="/how-it-works" className="link justify-self-start">
+              Read the full rules
             </Link>
           </div>
+          <ol className="grid gap-8 md:col-span-7 md:col-start-6">
+            {STEPS.map((step, i) => (
+              <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-line pt-5">
+                <span aria-hidden className="headline text-step-3 leading-none text-clay">
+                  {i + 1}
+                </span>
+                <div className="grid gap-1">
+                  <h3 className="text-step-1 font-semibold">{step.title}</h3>
+                  <p className="text-ink-2">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section aria-labelledby="trust-title" className="bg-surface-sunk">
-        <div className="wrap grid gap-10 py-14 md:grid-cols-[1.1fr_1fr] md:gap-16 md:py-20">
-          <div className="grid content-start gap-5">
-            <h2 id="trust-title" className="board-type text-step-4">
-              In Kenya’s towns, most renters deal with a person, not a company
+      <section aria-labelledby="safety-title" className="border-t border-line">
+        <div className="wrap grid gap-10 py-16 md:grid-cols-12 md:gap-6 md:py-24">
+          <figure className="grid content-start gap-4 md:col-span-6">
+            <blockquote>
+              <p className="display text-step-4">
+                78.7% of households in Kenya&apos;s towns rent their home, and about 89% of those rentals are
+                let by individuals.
+              </p>
+            </blockquote>
+            <figcaption className="text-step--1 text-ink-3">
+              Kenya National Bureau of Statistics, 2019 Kenya Population and Housing Census.
+            </figcaption>
+          </figure>
+          <div className="grid content-start gap-4 md:col-span-5 md:col-start-8">
+            <h2 id="safety-title" className="headline text-step-3">
+              Renting from a person, safely
             </h2>
-            <dl className="grid grid-cols-2 gap-6">
-              <div className="grid gap-1">
-                <dt className="order-2 text-ink-2">of urban households in Kenya rent their home</dt>
-                <dd className="board-type order-1 text-step-5">78.7%</dd>
-              </div>
-              <div className="grid gap-1">
-                <dt className="order-2 text-ink-2">of urban rentals are let by individuals</dt>
-                <dd className="board-type order-1 text-step-5">~89%</dd>
-              </div>
-            </dl>
-            <p className="text-step--1 text-ink-3">
-              Source: Kenya National Bureau of Statistics, 2019 Kenya Population and Housing Census.
+            <p className="text-ink-2">
+              Most of the time you are dealing with a landlord or a caretaker, not a company. These four rules
+              protect you either way.
             </p>
-            <p className="measure text-ink-2">
-              So the person you deal with is usually just that: a person. KejaLink shows you who they are,
-              keeps every listing&apos;s availability honest, and gives you a clear answer before you travel
-              to view.
-            </p>
-          </div>
-          <div className="grid content-start gap-4 self-start rounded-md border border-line bg-surface-2 p-6">
-            <h3 className="flex items-center gap-2 text-step-1 font-bold">
-              <ShieldCheck aria-hidden className="size-5" />
-              Stay safe when renting
-            </h3>
             <ul className="grid gap-3">
               {[
                 "View the house in person before you pay anything.",
-                "Never pay a “viewing fee” or a deposit to hold a place you haven't seen.",
-                "Meet at the house, in daylight, and take a friend if you can.",
-                "Get a written receipt or agreement for every payment.",
-              ].map((tip) => (
-                <li key={tip} className="flex gap-2.5">
-                  <CircleCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-success" />
-                  {tip}
+                "Never pay a viewing fee, or a deposit to hold a place you have not seen.",
+                "Meet at the house in daylight, and take a friend if you can.",
+                "Pay into an account in the landlord's or agent's name, and keep the receipt.",
+              ].map((rule) => (
+                <li key={rule} className="border-t border-line pt-3">
+                  {rule}
                 </li>
               ))}
             </ul>
@@ -254,27 +297,22 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section aria-labelledby="list-title" className="wrap py-14 md:py-20">
-        <div className="on-board grid gap-6 rounded-md bg-board p-6 text-on-board md:grid-cols-[1fr_auto] md:items-center md:p-10">
-          <div className="grid gap-3">
-            <h2 id="list-title" className="board-type text-step-4">
-              Got a room, bedsitter or house to let?
+      <section aria-labelledby="list-title" className="on-forest bg-forest text-on-forest">
+        <div className="wrap grid gap-6 py-16 md:grid-cols-12 md:items-end md:gap-6 md:py-20">
+          <div className="grid gap-3 md:col-span-7">
+            <h2 id="list-title" className="display text-step-5">
+              Letting a room, a bedsitter or a house?
             </h2>
-            <p className="measure text-on-board-2">
-              List it from your phone in a few minutes. Requests come to you, you pick who views it, and the
-              listing shows as taken the moment you confirm.
-            </p>
-            <p className="flex items-center gap-2 text-step--1 text-on-board-2">
-              <Clock aria-hidden className="size-4" />
-              Answer requests when it suits you. Your email goes only to the person you confirm.
+            <p className="measure text-on-forest-2">
+              List it from your phone in a few minutes. Requests come to you, you choose who views it, and
+              your email is shared only with the person you confirm.
             </p>
           </div>
-          <Button asChild variant="band" size="lg">
-            <Link href="/register?as=tenant">
-              List your place
-              <ArrowRight aria-hidden />
-            </Link>
-          </Button>
+          <div className="md:col-span-4 md:col-start-9 md:justify-self-end">
+            <Button asChild size="lg" className="border-0 bg-paper text-forest hover:bg-ground">
+              <Link href="/register?as=tenant">List your place</Link>
+            </Button>
+          </div>
         </div>
       </section>
     </>

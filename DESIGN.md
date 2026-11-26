@@ -1,82 +1,106 @@
-# KejaLink design system
+# KejaLink design system: "Nairobi Urban Living"
 
-> Status: provisional, written before the build as the brief requires. Impeccable's documenter
-> rewrites it from the shipped code at the finish review.
+> Status: the direction for the redesign, written at Phase 2. The owner's brief pins it (palette
+> roles, DM Sans + Newsreader, editorial language), so it was not rolled. Impeccable's documenter
+> rewrites this file from the shipped code when the redesign is finished. The previous identity
+> ("the stage board") is retired; see `docs/design/AUDIT-UI.md` for why.
 
-## The idea: the stage board
+## The idea
 
-Nairobi already has a public, trusted visual language for "where is this going, what does it cost,
-is there room": the **matatu**. Route boards in condensed caps, the PSV yellow band carrying route and
-capacity facts, the conductor calling out a stage. KejaLink treats every listing as a matatu that has
-pulled into the stage with its route board up: _the area, the price, whether there's room_.
+KejaLink reads like a carefully edited Kenyan property publication that you can also search and
+act on:
 
-- **Why it fits:** seekers already read matatu boards fluently, fast, on the move. The facts a
-  matatu carries (destination, fare, space) map one-to-one onto what a seeker scans for (area, rent,
-  availability). It is unmistakably Nairobi without costumes, flags or caricature.
-- **What it refuses:** the property-portal grid of floating rounded cards on grey with a blue
-  button; the luxury-dark "residences" look; SaaS gradients and glass.
+- photographs lead;
+- the type has an editor's hierarchy;
+- the interface stays quiet until you need it.
 
-### Rejected alternatives
+Trust comes from restraint and precision, not ornament.
 
-| Direction                                | Why not                                                                                       |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Duplicate receipt book and rubber stamps | Very resonant for rent, but paper + stamps lands in the editorial "cream + serif" rut         |
-| Hand-painted duka signwriting            | Charming, but lettering by hand is hard to do honestly in a type system, and risks caricature |
-| M-Pesa SMS receipts                      | Strong trust cue, but turns the whole product into a monospace costume                        |
-| Kanga borders and sayings                | Beautiful, but ornamental; competes with listing photos                                       |
-| "TO LET" gate signs                      | The literal reading of the category; one note, not a world                                    |
-| Split-flap board (catalog challenger)    | Kept as a discipline for dashboards (fixed columns), not as a look                            |
-| VHS rental wall (catalog challenger)     | Kept as a discipline: taken places stay visible, marked "Taken"                               |
+### Why it is Nairobi, not "warm editorial"
 
-## Colour (OKLCH, semantic tokens)
+The brief pins a warm ground, a serif and an earthy accent, which is a well-worn combination. It
+is made specific by taking each colour from the city instead of from a template:
 
-Strategy: **Committed.** The yellow band owns whole regions; ink and body-white do the rest.
+| Role               | Source                                                                                    | Not                        |
+| ------------------ | ----------------------------------------------------------------------------------------- | -------------------------- |
+| Ground (limestone) | Nairobi building stone: the buff, slightly grey quarry stone of the city's older blocks   | page-cream `#F4F1EA`       |
+| Brand (forest)     | Karura and Ngong Road forest greens: deep, slightly blue-green                            | mint, or SaaS emerald      |
+| Accent (murram)    | The red laterite of murram roads and clay roof tiles, browner and darker than clay-orange | `#D97757`-style terracotta |
+| Ink (charcoal)     | Warm charcoal                                                                             | tinted near-black `#111`   |
 
-| Token                                           | Role                                                        |
-| ----------------------------------------------- | ----------------------------------------------------------- |
-| `--surface` / `--surface-2` / `--surface-sunk`  | body-paint white ground, raised panel, sunken field         |
-| `--ink` / `--ink-2` / `--ink-3`                 | vinyl black text, secondary, tertiary (all AA on surface)   |
-| `--board` / `--on-board`                        | route-board ink panel and its text                          |
-| `--band` / `--on-band`                          | PSV yellow band and the ink set on it (primary action)      |
-| `--accent`                                      | focus and links (deep matatu-livery blue, never a gradient) |
-| `--success` / `--warning` / `--danger`          | semantic feedback                                           |
-| `--status-pending/confirmed/rejected/cancelled` | booking states, always with a label and an icon             |
-| `--status-published/rejected`                   | listing moderation states                                   |
+The accent is rare by rule: one editorial mark or one selected state per screen.
 
-Dark mode: tokens are defined for `[data-theme="dark"]`; it ships only after the quality gates pass.
+## Colour (OKLCH tokens, `src/app/globals.css`)
+
+Strategy: **Restrained.** The limestone ground and ivory paper carry the page. Forest is the brand
+and the primary action, plus at most one forest field per page (the lister section on the landing
+page). Murram is used sparingly.
+
+| Token                                           | Value                            | Role                                                          |
+| ----------------------------------------------- | -------------------------------- | ------------------------------------------------------------- |
+| `--ground`                                      | `oklch(0.955 0.011 84)`          | page                                                          |
+| `--paper`                                       | `oklch(0.985 0.007 88)`          | raised surfaces, inputs, sheets                               |
+| `--sunk`                                        | `oklch(0.928 0.012 82)`          | wells, image placeholders                                     |
+| `--line` / `--line-strong`                      | `0.87` / `0.6`                   | hairlines / control borders (3.5:1)                           |
+| `--ink` / `--ink-2` / `--ink-3`                 | `0.25` / `0.40` / `0.49`, hue 65 | text (14:1 / 8.1:1 / 5.5:1 on ground)                         |
+| `--forest` (+ hover / press / soft / on-forest) | `oklch(0.40 0.075 158)`          | brand, primary action, links, focus                           |
+| `--clay` / `--clay-soft`                        | `oklch(0.52 0.115 42)`           | murram accent (5:1 on ground)                                 |
+| success / warning / danger / info (+ soft)      |                                  | system states                                                 |
+| `--status-*`                                    | mapped to the above              | PENDING, CONFIRMED, REJECTED, CANCELLED; PUBLISHED, moderated |
+
+Dark tokens are prepared under `[data-theme="dark"]`; dark mode is not shipped.
 
 ## Type
 
-- **Display:** Archivo, `wdth` 62–75, weight 800–900, uppercase, tight tracking (≥ -0.02em),
-  tabular figures for money.
-- **Text/UI:** Atkinson Hyperlegible Next 400/600/700.
-- Fluid scale from `--step--1` to `--step-6` (clamp-based); body 16–17 px, line length ≤ 70ch.
+- **Newsreader** (variable, `opsz` 6–72) is for editorial headings and selected statements:
+  - `.display` for page titles: weight 400, tracking −0.02em;
+  - `.headline` for section titles: weight 500.
+  - Sentence case throughout. No caps labels, no single italicised accent word.
+- **DM Sans** (variable, `opsz`) is for interface text, labels, figures and tables.
+  - `.figure` for money: 600, tabular numerals.
+- **Scale:** UI steps are fixed at 0.875 / 1 / 1.125 rem. The editorial steps 2–6 are fluid, with
+  6 capped at 4.5rem. Body text is ≤ 66ch.
 
-## Space, radius, elevation
+## Space, shape, depth
 
-- Spacing on a 4 px base (`--space-1` = 4 px … `--space-16` = 64 px), 8 px rhythm for layout.
-- Radius: painted panels, square-ish: `--radius-xs` 2, `--radius-sm` 4, `--radius-md` 6, `--radius-pill` for chips only.
-- Elevation: two soft, offset shadows (`--shadow-1`, `--shadow-2`) for sheets and dialogs only.
-  Listing plates sit flat on the ground with a 1 px rule; no glowing cards.
+- **Space:** 4 px base with an 8 px rhythm; 2 px micro-steps only between an icon and its label.
+  Predictable widths: `--wrap` 75rem, `--measure` 66ch.
+- **Radius:** 2 / 4 / 6 px. Pills are for dots only.
+- **Depth:** hairlines separate things, and nothing nests more than one container deep. Shadows
+  exist for overlays only (sheets, dialogs, toasts).
 
 ## Imagery
 
-- Photos come only from listers. They are always inside aspect-locked frames (4:3 cards, 3:2
-  gallery), delivered through Cloudinary transforms (`f_auto,q_auto,c_fill,w_*`) so a slow phone
-  never downloads more than it shows.
-- A listing with no photo gets a designed "no photo yet" plate (route-board type on a sunken
-  ground), never a stock photo.
+Photographs come only from listers, through Cloudinary transforms:
+
+- aspect locked at 4:3 for cards and 3:2 for the gallery;
+- cropped `g_auto`;
+- responsive widths.
+
+A listing without photos gets a quiet, compact placeholder that never takes over the card. No
+stock photography, ever.
 
 ## Motion
 
-- One grammar, **pulling in:** a short horizontal travel (8–16 px) with an exponential ease-out of
-  180–260 ms, transform and opacity only.
-- The signature moment is the route-board readout, which flips line by line as filters change.
-- Sheets and dialogs use a stiff spring with no bounce. Nothing loops, nothing is scroll-linked.
-  `prefers-reduced-motion` turns travel into an instant state change.
+Motion answers an action and nothing else:
 
-## Components (built on Radix, fully restyled)
+- dialog and sheet open/close;
+- press feedback (scale 0.98);
+- toasts;
+- the photo reorder.
 
-Button (band / board / quiet / danger), Field (label + hint + inline error), Select, Sheet (bottom
-on mobile), Dialog, Tabs (status tabs), Badge/Plate (status), Toast (sonner), Skeleton, Avatar
-(initials), Pagination, Table (dense, sticky header, tabular numerals).
+There are no load-in reveals, no hover lifts and no loops. Durations are 120 / 180 / 240 ms on a
+gentle ease-out. Reduced motion makes every change instant.
+
+## Template tells removed (from `docs/design/AUDIT-UI.md`)
+
+- condensed caps headings;
+- ink slabs;
+- yellow band strips and dashed rules;
+- big-number stat blocks;
+- nested boxed lists;
+- chip clutter;
+- `A · B · C` meta strings;
+- `→` on links;
+- caps labels;
+- identical section templates.

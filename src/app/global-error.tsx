@@ -13,8 +13,8 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           gap: "1rem",
           padding: "1.5rem",
           fontFamily: "system-ui, sans-serif",
-          background: "#f7f9fb",
-          color: "#1c2130",
+          background: "#fafaf9",
+          color: "#121210",
         }}
       >
         <h1 style={{ margin: 0, fontSize: "2rem", textTransform: "uppercase" }}>KejaLink hit a snag</h1>
@@ -31,7 +31,7 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
             border: 0,
             borderRadius: 4,
             background: "#fbd02f",
-            color: "#1c2130",
+            color: "#121210",
             fontWeight: 700,
             fontSize: "1rem",
             cursor: "pointer",

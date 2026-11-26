@@ -28,11 +28,8 @@ async function loadProperty(
   id: string,
 ): Promise<{ property: PropertyDetail; isPublic: boolean } | "not-found"> {
   if (!isUuid(id)) return "not-found";
-  try {
-    return { property: (await getPublicProperty(id)).data, isPublic: true };
-  } catch (error) {
-    if (!isApiError(error) || (error.status !== 404 && error.status !== 422)) throw error;
-  }
+  const publicListing = await getPublicProperty(id);
+  if (publicListing) return { property: publicListing, isPublic: true };
   if (!(await getServerSession())) return "not-found";
   try {
     return { property: (await authedGet(`/properties/${id}`, propertyDetail)).data, isPublic: false };
@@ -48,7 +45,8 @@ export async function generateMetadata({ params }: PageProps<"/properties/[id]">
   const { id } = await params;
   if (!isUuid(id)) return { title: "Place not found" };
   try {
-    const { data: p } = await getPublicProperty(id);
+    const p = await getPublicProperty(id);
+    if (!p) return { title: "Place not found", robots: { index: false } };
     const title = `${p.title} · ${formatKes(p.priceAmount)}/month`;
     const description = `${headline(p)}. ${formatKes(p.priceAmount)} a month${p.isAvailable ? "" : " (currently taken)"}. ${p.description.slice(0, 140)}`;
     return {
@@ -165,7 +163,7 @@ async function PropertyView({ params }: { params: PageProps<"/properties/[id]">[
         <header className="grid gap-4">
           <div className="on-board flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-sm bg-board px-4 py-3 text-on-board">
             <p className="board-type flex items-center gap-2 text-step-4">
-              <MapPin aria-hidden className="size-6 text-band" />
+              <MapPin aria-hidden className="size-6 text-on-board-2" />
               {p.area}
             </p>
             <p className="text-on-board-2">{p.county} County</p>

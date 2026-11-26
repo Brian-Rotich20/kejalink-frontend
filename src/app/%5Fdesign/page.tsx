@@ -16,18 +16,18 @@ import { DesignInteractive } from "./interactive";
 export const metadata: Metadata = { title: "Design system", robots: { index: false, follow: false } };
 
 const COLORS = [
-  ["surface", "bg-surface"],
-  ["surface-2", "bg-surface-2"],
-  ["surface-sunk", "bg-surface-sunk"],
+  ["ground", "bg-ground"],
+  ["paper", "bg-paper"],
+  ["sunk", "bg-sunk"],
   ["line", "bg-line"],
   ["line-strong", "bg-line-strong"],
   ["ink", "bg-ink"],
   ["ink-2", "bg-ink-2"],
   ["ink-3", "bg-ink-3"],
-  ["board", "bg-board"],
-  ["board-2", "bg-board-2"],
-  ["band", "bg-band"],
-  ["accent", "bg-accent"],
+  ["forest", "bg-forest"],
+  ["forest-soft", "bg-forest-soft"],
+  ["clay", "bg-clay"],
+  ["clay-soft", "bg-clay-soft"],
   ["success", "bg-success"],
   ["warning", "bg-warning"],
   ["danger", "bg-danger"],
@@ -53,14 +53,14 @@ export default function DesignPage() {
     <main id="main" className="wrap grid gap-16 py-12">
       <header className="grid gap-4">
         <Wordmark size="lg" />
-        <h1 className="board-type text-step-5">The stage board</h1>
+        <h1 className="display text-step-6">Nairobi Urban Living</h1>
         <p className="measure text-ink-2">
           Tokens, type and primitives exactly as the app uses them. Development only.
         </p>
       </header>
 
       <section aria-labelledby="colour" className="grid gap-4">
-        <h2 id="colour" className="board-type text-step-3">
+        <h2 id="colour" className="headline text-step-3">
           Colour
         </h2>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
@@ -71,17 +71,16 @@ export default function DesignPage() {
             </li>
           ))}
         </ul>
-        <div aria-hidden className="band-rule" />
       </section>
 
       <section aria-labelledby="type" className="grid gap-4">
-        <h2 id="type" className="board-type text-step-3">
+        <h2 id="type" className="headline text-step-3">
           Type
         </h2>
         <div className="grid gap-3">
           {STEPS.map((step) => (
-            <p key={step} className={`board-type ${STEP_CLASS[step]}`}>
-              Kahawa Wendani · {formatKes(12500)}
+            <p key={step} className={`headline ${STEP_CLASS[step]}`}>
+              A bedsitter near the KU main gate, {formatKes(12500)} a month
             </p>
           ))}
         </div>
@@ -92,29 +91,28 @@ export default function DesignPage() {
       </section>
 
       <section aria-labelledby="buttons" className="grid gap-4">
-        <h2 id="buttons" className="board-type text-step-3">
+        <h2 id="buttons" className="headline text-step-3">
           Buttons
         </h2>
         <div className="flex flex-wrap gap-3">
-          <Button variant="band">Show places</Button>
-          <Button variant="board">Request a viewing</Button>
-          <Button>Save changes</Button>
+          <Button variant="primary">Show places</Button>
+          <Button variant="secondary">Request a viewing</Button>
           <Button variant="ghost">Cancel</Button>
           <Button variant="danger">Delete listing</Button>
           <Button variant="danger-quiet">Decline request</Button>
-          <Button variant="band" loading>
+          <Button variant="primary" loading>
             Sending
           </Button>
           <Button disabled>Disabled</Button>
           <Button size="sm">Small</Button>
-          <Button size="lg" variant="band">
+          <Button size="lg" variant="primary">
             Large
           </Button>
         </div>
       </section>
 
       <section aria-labelledby="plates" className="grid gap-4">
-        <h2 id="plates" className="board-type text-step-3">
+        <h2 id="plates" className="headline text-step-3">
           Plates
         </h2>
         <div className="flex flex-wrap items-center gap-3">
@@ -136,17 +134,6 @@ export default function DesignPage() {
           <Skeleton className="aspect-[4/3]" />
           <Skeleton className="h-6 w-2/3" />
           <Skeleton className="h-4 w-1/3" />
-        </div>
-      </section>
-
-      <section aria-labelledby="board" className="on-board grid gap-4 rounded-md bg-board p-6 text-on-board">
-        <h2 id="board" className="board-type text-step-3 text-band">
-          Route board
-        </h2>
-        <p className="board-type text-step-4">Kilimani · Bedsitter · ≤ {formatKes(15000)}</p>
-        <p className="text-on-board-2">Ink panels switch the focus ring to the band.</p>
-        <div>
-          <Button variant="band">Show places</Button>
         </div>
       </section>
 

@@ -135,3 +135,101 @@ contain "test" (`kejalink_e2e_test`), with every env var set explicitly so nothi
 `backend/.env`. It injects a fake image host via the backend's own `setImageStorage` seam; the fake
 returns Cloudinary's public demo images, so the frontend's loader is exercised for real. The local
 dev server points at it through a gitignored `.env.local`, so local writes never reach production.
+
+## F-14 Fresh availability beats cache
+
+Public listing reads are cached for 30 s at most. Two safeguards keep availability accurate:
+
+- The proxy calls `revalidateTag("properties", { expire: 0 })` after any successful write to
+  `/api/properties`, `/api/bookings` or `/api/admin/(properties|users)`.
+- The booking panel re-checks the listing live on mount.
+
+`"use cache"` storage is per instance on serverless, so the live check is the one that guarantees
+a taken place never offers a request button.
+
+## F-15 Not-found is a value, not an exception, across the cache boundary
+
+Errors thrown inside a `"use cache"` function are serialised and lose their class. `instanceof
+ApiError` then fails, and a removed listing showed "didn't load" instead of the 404.
+`getPublicProperty` therefore returns `null` for 404/422 and throws only for real failures, which
+are never cached.
+
+## F-16 Streaming pages answer 200 for a missing listing
+
+Under Cache Components the listing page streams its shell before the data arrives. A missing
+listing renders the designed 404 with `noindex` after a 200 status line; Next's documented
+behaviour. Unknown routes (no matching segment) still return a real 404.
+
+## F-17 Forms are inert until hydrated
+
+Login, register and the listing form keep their submit button disabled until React hydrates, and
+use `method="post"`. A native submit before hydration would otherwise send a GET with the password
+in the URL, and React Hook Form ignores values typed before hydration anyway.
+
+## F-18 Admin "suspend vs ban"
+
+The API treats SUSPENDED and BANNED the same way: sign-in is blocked and every session is revoked.
+The UI presents suspend as temporary and ban as being for fraud or abuse, and lets both be
+reactivated. A "ban is permanent" claim would not be true, so the UI does not make it.
+
+## F-19 Status labels
+
+The API says REJECTED for both bookings and listings. People read "Declined" for an answered
+request and "Taken down" for a moderated listing; the codes are unchanged.
+
+## F-20 Uploads go through the proxy (Vercel's 4.5 MB body cap)
+
+Photos are resized in the browser to a 1600 px long edge and re-encoded as WebP, or JPEG where
+WebP encoding isn't available. Quality steps down from 0.82 until the photo is under 3.5 MB. EXIF
+orientation is applied. A 1 MB+ camera-size JPEG is uploaded in e2e to prove it.
+
+## F-21 Finish review: ink, not slate
+
+Impeccable's independent finish reviewer returned **fix** with eight material items, all applied
+in one batch. Its verdict pass then scored every one **resolved**:
+
+1. The ink family is neutral vinyl black (hue 90, chroma 0.004), not blue-black slate.
+2. Links and the focus ring are ink; there is no link blue.
+3. The "Where to?" label above the board is screen-reader only.
+4. Yellow is reserved for the band, band rules, the KNBS fact strip and one primary action per
+   screen.
+5. The listing plate's ink board carries area, fare and availability.
+6. The KNBS figures are one band fact strip set in a sentence (no big-number block).
+7. Every public section closes on the band rule.
+8. Phones get a visible "Sign in", and local fixtures are authored, labelled samples with no
+   stand-in photos.
+
+Open, not scored: at 360 × 780 the safety band starts ~29 px below the fold. "Show places" is
+inside it.
+
+## F-22 Performance: what we measured and how
+
+Lighthouse 12 and 13 cannot record a performance trace on the installed Chrome 158
+(`NO_NAVSTART`), and installing an older Chromium failed. Accessibility, Best Practices and SEO ran
+normally. Performance was measured with `e2e/measure/vitals.mjs`, which applies Lighthouse's
+mobile throttling for real (4× CPU, 150 ms RTT, 1.6 Mbps down) and reads LCP, CLS and long-task
+time over 3 runs.
+
+To bring the landing page down from 284 KB to 229 KB of initial gzipped JS:
+
+- The browser env module no longer uses Zod (about 39 KB). The server still validates with Zod
+  at startup.
+- The Better Auth plugin is built locally, so the `better-auth/client/plugins` barrel stays out of
+  the bundle.
+- The toaster and the phone menu sheet load lazily.
+
+The remaining 229 KB is mostly the React 19 + Next 16 runtime (react-dom alone is 72 KB), so the
+brief's ~170 KB target is not met.
+
+## F-23 Streaming metadata kept
+
+Dynamic pages stream their `<title>`/description (Next 16's default). HTML-limited crawlers still
+get blocking metadata, and Google renders JS. Lighthouse's SEO audit therefore flags "no meta
+description" on `/properties` and listing pages. Forcing blocking metadata for every visitor
+(`htmlLimitedBots: /.*/`) would add the API round-trip to TTFB on every page view, which we judged
+worse for this audience on 3G.
+
+## F-24 Zod runs jitless
+
+Zod 4 probes for `eval` (`Function("")`) to enable its JIT. The CSP forbids eval, so the probe only
+logged a CSP issue. `z.config({ jitless: true })` is set where the schemas load.

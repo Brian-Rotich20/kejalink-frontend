@@ -23,3 +23,15 @@ describe("server env", () => {
     }
   });
 });
+
+describe("public env parsing (dependency-free, ships to the browser)", () => {
+  it("accepts http(s) URLs, strips trailing slashes, rejects others without echoing", async () => {
+    const { parseEmail, parseHttpUrl } = await import("@/lib/env/public");
+    expect(parseHttpUrl("X", "https://kejalink.example/")).toBe("https://kejalink.example");
+    expect(parseHttpUrl("X", undefined)).toBeUndefined();
+    expect(() => parseHttpUrl("NEXT_PUBLIC_API_BASE", "ftp://secret-host")).toThrow(/NEXT_PUBLIC_API_BASE/);
+    expect(() => parseHttpUrl("NEXT_PUBLIC_API_BASE", "ftp://secret-host")).not.toThrow(/secret-host/);
+    expect(parseEmail("E", "help@kejalink.example")).toBe("help@kejalink.example");
+    expect(() => parseEmail("E", "nope")).toThrow(/E: must be an email/);
+  });
+});

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Booking panel · Dimensional drawing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="sheet.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="tb">
+    <div class="big">
+      <div><div class="lbl">UI component · dimensional drawing</div><h1>Booking panel</h1></div>
+      <div class="v">Desktop side column (≥ 1024) and phone bar that opens the same body as a bottom sheet. Architecture only.</div>
+    </div>
+    <div><div class="lbl">Dwg no.</div><div class="v">UI-BOOK-001</div></div>
+    <div><div class="lbl">Rev</div><div class="v">A · 2026-11-25</div></div>
+    <div><div class="lbl">Sheets</div><div class="v">1</div></div>
+    <div><div class="lbl">Units</div><div class="v">CSS px @ 1×</div></div>
+    <div><div class="lbl">Scale</div><div class="v">Noted per view</div></div>
+    <div><div class="lbl">Source</div><div class="v">Rendered · signed-out state · 1440 and 390</div></div>
+    <div class="notes">
+      <div><span class="nh">NOTES:<span>(UNLESS OTHERWISE SPECIFIED)</span></span><ol>
+        <li>Do not scale from screen. Read the numbers.</li>
+        <li>Body slot swaps per viewer: signed out, seeker form, owner, admin, taken.</li>
+        <li>Slots are placeholders. Copy is not part of the drawing.</li></ol></div>
+      <div><span class="nh" aria-hidden="true">&nbsp;</span><ol start="4">
+        <li>The column is sticky at header-h + 24 on desktop.</li>
+        <li>Availability is re-checked live on mount; the plate reflects it.</li>
+        <li>Grayscale by design. Color is out of scope.</li></ol></div>
+    </div>
+    <div class="figs">
+      <div><div class="lbl">WC · column-w</div><div class="v">360</div></div>
+      <div><div class="lbl">S1 · panel-pad</div><div class="v">20</div></div>
+      <div><div class="lbl">S2 · stack-gap</div><div class="v">16</div></div>
+      <div><div class="lbl">H7 · cta-h</div><div class="v">52</div></div>
+      <div><div class="lbl">HB · bar-h</div><div class="v">2·S4 + H5</div></div>
+      <div><div class="lbl">R1 · r-panel</div><div class="v">6</div></div>
+    </div>
+  </header>
+  <div class="sheetwrap"><div class="scroll"><svg id="sh1" viewBox="0 0 1700 1060" role="img" aria-label="Booking panel: desktop plan, phone bar, body states, variable tables"></svg></div>
+  <div class="foot"><span>2026-11-25 &nbsp;|&nbsp; UI component reference</span><span><b>Booking panel, architecture</b> &nbsp;|&nbsp; 1</span></div></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(function(){
+const {mk,tx,begin,dimH,dimV,callout,rad,nb,rr,slotLabel,title,notes,table,detailRef}=KIT;
+begin('sh1');
+notes([[1,'AVAILABILITY PLATE ABOVE THE FARE; BOTH HUG.'],[2,'BODY SLOT SWAPS BY VIEWER STATE (SEE STATES).'],[3,'PRIMARY ACTION FILLS THE PANEL; ONE PER PANEL.'],[4,'SAFETY BLOCK FOLLOWS AT SG; SAME RADIUS AND PADDING.'],[5,'PHONE BAR: FARE HUGS LEFT, ACTION HUGS RIGHT, FIXED, SAFE-AREA PADDED.']]);
+/* desktop plan 1.4:1 */
+{const k=1.4,PX=640,PY=130,X=v=>PX+v*k,Y=v=>PY+v*k;
+ rr(X(0),Y(0),360*k,347.6*k,6*k,'obj');
+ rr(X(21),Y(21),94*k,21*k,2*k,'hug');slotLabel(X(21),Y(21),94*k,21*k,'Avail');
+ rr(X(21),Y(50),212*k,48*k,0,'slot');slotLabel(X(21),Y(50),212*k,48*k,'Fare · hug','l');
+ rr(X(21),Y(114),318*k,20*k,0,'slot');slotLabel(X(21),Y(114),318*k,20*k,'Heading slot','l');
+ rr(X(21),Y(150),318*k,75*k,0,'slot');slotLabel(X(21),Y(150),318*k,75*k,'Body slot · state','l');
+ rr(X(21),Y(241),318*k,52*k,4*k,'hug');slotLabel(X(21),Y(241),318*k,52*k,'Primary action · fill');
+ rr(X(21),Y(309),318*k,18*k,0,'slot');slotLabel(X(21),Y(309),318*k,18*k,'Secondary line','l');
+ dimH(X(0),X(360),Y(-30),Y(0),Y(0),'WC');dimH(X(1),X(21),Y(-12),Y(0),Y(21),'S1',{dx:-10});dimH(X(339),X(359),Y(-12),Y(0),Y(21),'S1',{dx:10});
+ [[1,21,'S1'],[42,50,'S3'],[98,114,'S2'],[134,150,'S2'],[225,241,'S2'],[293,309,'S2'],[327,347,'S1']].forEach(([a,b,l])=>dimV(Y(a),Y(b),X(390),X(360),X(360),l,{side:'r'}));
+ dimV(Y(241),Y(293),X(-26),X(21),X(21),'H7',{side:'l'});dimV(Y(0),Y(347.6),X(-60),X(0),X(0),'(REF 348)');
+ rad(X(0),Y(347.6),6*k,'bl','R1',20);nb(X(124),Y(31),1);nb(X(350),Y(190),2);nb(X(350),Y(267),3);
+ rr(X(0),Y(367.6),360*k,60*k,6*k,'ph');tx(X(180),Y(400),'SAFETY BLOCK · CONTINUES','sl',{'text-anchor':'middle'});dimV(Y(347.6),Y(367.6),X(390),X(360),X(360),'SG',{side:'r'});nb(X(-12),Y(398),4);
+ title(X(180),Y(470),'Desktop · side column','Scale 1.4:1 · sticky');}
+/* phone bar 1.3:1 */
+{const k=1.3,BX=110,BY=760,X=v=>BX+v*k,Y=v=>BY+v*k;
+ rr(X(0),Y(0),390*k,69*k,0,'obj');
+ rr(X(16.6),Y(13),150*k,44*k,0,'slot');slotLabel(X(16.6),Y(13),150*k,44*k,'Fare · hug','l');
+ rr(X(203.2),Y(13),170.2*k,44*k,4*k,'hug');slotLabel(X(203.2),Y(13),170.2*k,44*k,'Action · hug');
+ dimV(Y(1),Y(13),X(-24),X(0),X(16),'S4',{side:'l'});dimV(Y(13),Y(57),X(-24),null,null,'H5',{side:'l'});dimV(Y(57),Y(69),X(-24),null,X(0),'S4',{side:'l'});
+ dimH(X(0),X(16.6),Y(84),Y(69),Y(57),'GT',{below:true});dimH(X(166.6),X(203.2),Y(84),Y(57),Y(57),'FLEX',{below:true,c:'dts'});dimH(X(373.4),X(390),Y(84),Y(57),Y(69),'GT',{below:true});
+ nb(X(395),Y(10),5);title(X(195),Y(130),'Phone · fixed bar','Scale 1.3:1 · opens the body as a bottom sheet');}
+/* states */
+{const SX=110,SY=270;tx(SX,SY-16,'BODY STATES','vt');
+ [['Signed out','Sign-in action · fill + register link'],['Seeker','Date · message · primary action'],['Owner','Manage listing · board action'],['Admin / lister','Read-only note'],['Taken','Explanation · find similar'],['Sent','Status + track request']].forEach(([a,b],i)=>{const y=SY+i*56;rr(SX,y,300,44,4,'thin');tx(SX+12,y+19,a,'vt');tx(SX+12,y+34,b,'dts')});}
+{let y=table(1426,86,'Spacing',[['S1','panel-pad','20'],['S2','stack-gap','16'],['S3','plate-gap','8'],['S4','bar-pad-y','12'],['SG','block-gap','20'],['GT','gutter','16–32 fluid']]);
+ y=table(1426,y,'Size',[['WC','column-w','360'],['H7','cta-h','52'],['H5','bar-action','44'],['HB','bar-h','2·S4+H5 = 68'],['HA','avail-h','21']]);
+ table(1426,y,'Radius',[['R1','r-panel','6'],['R3','r-action','4'],['R2','r-avail','2']]);}
+})();
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ function WakingMessage() {
   const show = useElapsed(4000);
   if (!show) return null;
   return (
-    <span className="pull-in inline-flex items-center gap-2.5 rounded-sm bg-board px-3 py-2 text-step--1 text-on-board">
+    <span className="pull-in inline-flex items-center gap-3 rounded-sm bg-board px-3 py-2 text-step--1 text-on-board">
       <span aria-hidden className="size-2 shrink-0 rounded-pill bg-band" />
       Waking the server up, one moment. This can take up to a minute after a quiet spell.
     </span>

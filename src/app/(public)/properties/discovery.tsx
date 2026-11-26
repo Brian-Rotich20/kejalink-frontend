@@ -134,7 +134,7 @@ function FilterPanel({ filters, set }: { filters: Filters; set: (patch: Partial<
         />
       </div>
       <fieldset className="grid gap-2">
-        <legend className={cn(label, "mb-1.5")}>Type</legend>
+        <legend className={cn(label, "mb-2")}>Type</legend>
         <div className="flex flex-wrap gap-2">
           {[null, ...PROPERTY_TYPES].map((t) => {
             const checked = filters.type === t;
@@ -163,7 +163,7 @@ function FilterPanel({ filters, set }: { filters: Filters; set: (patch: Partial<
         </div>
       </fieldset>
       <fieldset className="grid gap-2">
-        <legend className={cn(label, "mb-1.5")}>Rent a month (KES)</legend>
+        <legend className={cn(label, "mb-2")}>Rent a month (KES)</legend>
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-1">
             <label htmlFor={`${id}-min`} className="text-step--1 text-ink-2">
@@ -194,7 +194,7 @@ function FilterPanel({ filters, set }: { filters: Filters; set: (patch: Partial<
         </div>
       </fieldset>
       <fieldset className="grid gap-2">
-        <legend className={cn(label, "mb-1.5")}>Bedrooms</legend>
+        <legend className={cn(label, "mb-2")}>Bedrooms</legend>
         <div className="flex flex-wrap gap-2">
           {[null, ...BEDROOM_CHOICES].map((b) => {
             const checked = filters.bedrooms === b;
@@ -369,6 +369,7 @@ export function Discovery({
                     property={property}
                     index={index}
                     priority={index < 2 && filters.page === 1}
+                    headingLevel="h2"
                   />
                 </li>
               ))}

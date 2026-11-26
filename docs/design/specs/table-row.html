@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin table row · Dimensional drawing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="sheet.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="tb">
+    <div class="big">
+      <div><div class="lbl">UI component · dimensional drawing</div><h1>Table row</h1></div>
+      <div class="v">One dense moderation row (listings table) under its sticky header. Architecture only.</div>
+    </div>
+    <div><div class="lbl">Dwg no.</div><div class="v">UI-ROW-001</div></div>
+    <div><div class="lbl">Rev</div><div class="v">A · 2026-11-25</div></div>
+    <div><div class="lbl">Sheets</div><div class="v">1</div></div>
+    <div><div class="lbl">Units</div><div class="v">CSS px @ 1×</div></div>
+    <div><div class="lbl">Scale</div><div class="v">Noted per view</div></div>
+    <div><div class="lbl">Source</div><div class="v">Rendered · 1440 × 900 · admin listings</div></div>
+    <div class="notes">
+      <div><span class="nh">NOTES:<span>(UNLESS OTHERWISE SPECIFIED)</span></span><ol>
+        <li>Do not scale from screen. Read the numbers.</li>
+        <li>Column widths follow content (auto table layout); measured widths are REF only.</li>
+        <li>Slots are placeholders.</li></ol></div>
+      <div><span class="nh" aria-hidden="true">&nbsp;</span><ol start="4">
+        <li>Figures are tabular; columns never move, only values change.</li>
+        <li>Narrow screens scroll the region horizontally; the region is keyboard-focusable.</li>
+        <li>Grayscale by design.</li></ol></div>
+    </div>
+    <div class="figs">
+      <div><div class="lbl">CX · cell-pad-x</div><div class="v">12</div></div>
+      <div><div class="lbl">CY · cell-pad-y</div><div class="v">8</div></div>
+      <div><div class="lbl">HH · head-h</div><div class="v">2·CY + LH</div></div>
+      <div><div class="lbl">HR · row-h</div><div class="v">HUG</div></div>
+      <div><div class="lbl">H8 · action-h</div><div class="v">36 (≥ 768) · 44 below</div></div>
+      <div><div class="lbl">R1 · r-region</div><div class="v">6</div></div>
+    </div>
+  </header>
+  <div class="sheetwrap"><div class="scroll"><svg id="sh1" viewBox="0 0 1700 1060" role="img" aria-label="Table row: plan of header and one row, cell detail, actions detail, variable tables"></svg></div>
+  <div class="foot"><span>2026-11-25 &nbsp;|&nbsp; UI component reference</span><span><b>Table row, architecture</b> &nbsp;|&nbsp; 1</span></div></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(function(){
+const {mk,tx,begin,dimH,dimV,callout,rad,nb,rr,slotLabel,title,notes,table}=KIT;
+begin('sh1');
+notes([[1,'HEADER IS STICKY INSIDE THE SCROLL REGION (MAX-H 70DVH).'],[2,'CELLS ALIGN TOP; THE ROW HUGS ITS TALLEST CELL.'],[3,'ACTIONS ARE END-ALIGNED AND HUG; GAP S4.'],[4,'STATUS IS A PLATE: LABEL + ICON.'],[5,'PROTECTED ROWS SHOW A TEXT TOKEN INSTEAD OF ACTIONS.']]);
+const cols=[256,232.8,185.8,84.1,86.8,108.5,196.1],names=['Listing · flex','Lister','Where','Rent','Status','Updated','Actions'];
+/* plan 0.9:1 */
+{const k=.9,PX=150,PY=420,X=v=>PX+v*k,Y=v=>PY+v*k,W=1150;
+ rr(X(-1),Y(-40),1152*k,(40+86+60)*k,6*k,'obj');
+ rr(X(0),Y(-39),W*k,35*k,0,'hug');
+ let x=0;cols.forEach((w,i)=>{rr(X(x+12),Y(-31),Math.min(70,w-24)*k,19*k,0,'slot');slotLabel(X(x+12),Y(-31),Math.min(70,w-24)*k,19*k,'TH');
+  if(i<cols.length-1){mk('line',{x1:X(x+w),y1:Y(-39),x2:X(x+w),y2:Y(86),class:'ph'})}
+  rr(X(x+12),Y(8),(w-24)*k,(i===0?62:i===6?36:i===4?22:40)*k,i===6?4*k:0,i===6||i===4?'hug':'slot');slotLabel(X(x+12),Y(8),(w-24)*k,(i===0?62:i===6?36:i===4?22:40)*k,names[i]);x+=w});
+ mk('line',{x1:X(0),y1:Y(-4),x2:X(W),y2:Y(-4),class:'thin'});mk('line',{x1:X(0),y1:Y(86),x2:X(W),y2:Y(86),class:'thin'});
+ rr(X(0),Y(86),W*k,40*k,0,'ph');tx(X(W/2),Y(110),'NEXT ROW','sl',{'text-anchor':'middle'});
+ let cx=0;cols.forEach((w,i)=>{dimH(X(cx),X(cx+w),Y(-70),Y(-40),Y(-40),i===0?'FLEX':'HUG · '+Math.round(w),{c:'dts'});cx+=w});
+ dimV(Y(-39),Y(-4),X(-24),X(0),X(0),'HH',{side:'l'});dimV(Y(-4),Y(86),X(-24),X(0),X(0),'HR',{side:'l'});
+ nb(X(W+14),Y(-22),1);nb(X(W+14),Y(40),2);nb(X(1010),Y(-10),3);nb(X(800),Y(-10),4);
+ title(X(W/2),Y(170),'Plan · header + one row','Scale 0.9:1 · REF widths from a 1150 table');}
+/* cell detail 3:1 */
+{const q=3,DX=200,DY=720;rr(DX,DY,120*q,60*q,0,'thin');rr(DX+12*q,DY+8*q,96*q,44*q,0,'slot');slotLabel(DX+12*q,DY+8*q,96*q,44*q,'Cell content · top-aligned');
+ dimH(DX,DX+12*q,DY-16,DY,DY+8*q,'CX',{dx:-6});dimV(DY,DY+8*q,DX+120*q+20,DX+120*q,DX+120*q,'CY',{side:'r'});
+ title(DX+180,DY+220,'Detail A · cell','Scale 3:1');}
+/* actions detail 2:1 */
+{const q=2,DX=820,DY=740;rr(DX,DY,95.5*q,36*q,4*q,'thin');slotLabel(DX,DY,95.5*q,36*q,'Action');rr(DX+103.5*q,DY,68*q,36*q,4*q,'thin');slotLabel(DX+103.5*q,DY,68*q,36*q,'Action');
+ dimH(DX+95.5*q,DX+103.5*q,DY-14,DY,DY,'S4');dimV(DY,DY+36*q,DX-20,DX,DX,'H8',{side:'l'});dimH(DX,DX+12*q,DY+36*q+18,DY+36*q,DY+36*q,'S3',{below:true,dx:-6});
+ rad(DX+171.5*q,DY+36*q,4*q,'br','R3',16);nb(DX+180*q,DY-10,5);
+ title(DX+170,DY+160,'Detail B · actions','Scale 2:1 · end-aligned · hug');}
+{let y=table(1426,86,'Spacing',[['CX','cell-pad-x','12'],['CY','cell-pad-y','8'],['S3','action-pad-x','12'],['S4','action-gap','8']]);
+ y=table(1426,y,'Size',[['HH','head-h','2·CY+LH = 35'],['LH','head-line','19'],['HR','row-h','HUG · REF 82'],['H8','action-h','36 / 44'],['HP','plate-h','22'],['MH','region-max','70dvh']]);
+ table(1426,y,'Radius',[['R1','r-region','6'],['R3','r-action','4'],['R2','r-plate','2']]);}
+})();
+</script>
+</body>
+</html>

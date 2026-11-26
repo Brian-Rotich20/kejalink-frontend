@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listing plate · Dimensional drawing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="sheet.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="tb">
+    <div class="big">
+      <div><div class="lbl">UI component · dimensional drawing</div><h1>Listing plate</h1></div>
+      <div class="v">Architecture only: photo frame, route-board strip, fare body, slots, spacing, radii and layers. Content is out of scope.</div>
+    </div>
+    <div><div class="lbl">Dwg no.</div><div class="v">UI-PLATE-001</div></div>
+    <div><div class="lbl">Rev</div><div class="v">A · 2026-11-25</div></div>
+    <div><div class="lbl">Sheets</div><div class="v">1</div></div>
+    <div><div class="lbl">Units</div><div class="v">CSS px @ 1×</div></div>
+    <div><div class="lbl">Scale</div><div class="v">1:1 unless noted</div></div>
+    <div><div class="lbl">Source</div><div class="v">Rendered component · 1440 × 900 · 3-col grid</div></div>
+    <div class="notes">
+      <div><span class="nh">NOTES:<span>(UNLESS OTHERWISE SPECIFIED)</span></span><ol>
+        <li>Do not scale from screen. Read the numbers.</li>
+        <li>Measured in a browser from the shipped component (getBoundingClientRect + computed style).</li>
+        <li>Slots are placeholders. Text and photos are not part of the drawing.</li></ol></div>
+      <div><span class="nh" aria-hidden="true">&nbsp;</span><ol start="4">
+        <li>Every dimension is a variable; derived values are formulas.</li>
+        <li>HUG = sized by content · FLEX = remaining space · FILL = parent width.</li>
+        <li>Spacing on a 4 px grid; 2 px micro-steps only between an icon and its label.</li>
+        <li>Grayscale by design. Color is out of scope.</li></ol></div>
+    </div>
+    <div class="figs">
+      <div><div class="lbl">W · plate-w</div><div class="v">FILL · REF 264</div></div>
+      <div><div class="lbl">HP · photo-h</div><div class="v">(W − 2B) · 3/4</div></div>
+      <div><div class="lbl">HB · board-h</div><div class="v">2·S2 + LH2</div></div>
+      <div><div class="lbl">S3 · plate-pad</div><div class="v">16</div></div>
+      <div><div class="lbl">S5 · stack-gap</div><div class="v">8</div></div>
+      <div><div class="lbl">R1 · r-plate</div><div class="v">6</div></div>
+      <div><div class="lbl">G · grid-gap</div><div class="v">20</div></div>
+    </div>
+  </header>
+  <div class="sheetwrap"><div class="scroll"><svg id="sh1" viewBox="0 0 1700 1060" role="img" aria-label="Listing plate: plan view, layer stack, grid detail, availability plate detail, radius detail, variable tables"></svg></div>
+  <div class="foot"><span>2026-11-25 &nbsp;|&nbsp; UI component reference</span><span><b>Listing plate, architecture</b> &nbsp;|&nbsp; 1</span></div></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(function(){
+const {mk,tx,begin,dimH,dimV,callout,rad,nb,rr,slotLabel,title,notes,table,detailRef,hat}=KIT;
+/* Measured (1440 px, xl 3 columns): W 264, B 1, photo 262×196.5, board 262×51.7, body pad 12/16/16. */
+const W=264,B=1,HP=196.5,HB=51.7,BODY=147.1,H=HP+HB+BODY+2*B;
+begin('sh1');
+notes([[1,'PHOTO FRAME LOCKED TO 4:3; IMAGE CROPPED (c_fill, g_auto). NO PHOTO → EMPTY STATE SLOT.'],[2,'AVAILABILITY PLATE INSET S1 FROM THE PHOTO CORNER. ALWAYS LABEL + DOT.'],[3,'BOARD STRIP: AREA FLEX (TRUNCATES), COUNTY HUGS. ONE LINE.'],[4,'TITLE CLAMPS AT 2 LINES. THE TITLE LINK COVERS THE WHOLE PLATE.'],[5,'FOOTER SLOT (DASHBOARDS ONLY) SITS ABOVE THE COVER LINK.'],[6,'HOVER: LIFT Y = 2, SHADOW-1. REDUCED MOTION: NO LIFT.'],[0,'HEIGHT HUGS CONTENT; ROWS ALIGN BY GRID STRETCH.']]);
+/* plan */
+{const k=1.35,PX=800,PY=170;const X=v=>PX+v*k,Y=v=>PY+v*k;
+ rr(X(0),Y(0),W*k,H*k,6*k,'obj');
+ rr(X(B),Y(B),(W-2*B)*k,HP*k,0,'well');mk('path',{d:'M'+X(1)+','+Y(1)+' L'+X(W-1)+','+Y(1+HP)+' M'+X(W-1)+','+Y(1)+' L'+X(1)+','+Y(1+HP),class:'thin'});
+ slotLabel(X(1),Y(1+HP/2-14),(W-2)*k,20,'Photo slot · 4:3 · fill');
+ rr(X(13),Y(13),94.3*k,21*k,2*k,'hug');slotLabel(X(13),Y(13),94.3*k,21*k,'Avail');
+ const by=1+HP;rr(X(1),Y(by),(W-2)*k,HB*k,0,'hug');
+ rr(X(17),Y(by+12),150*k,27.7*k,0,'slot');slotLabel(X(17),Y(by+12),150*k,27.7*k,'Area · flex','l');
+ rr(X(196),Y(by+16),51*k,20*k,0,'slot');slotLabel(X(196),Y(by+16),51*k,20*k,'Hug');
+ const ty=by+HB;mk('line',{x1:X(1),y1:Y(ty),x2:X(W-1),y2:Y(ty),class:'ph'});
+ const py=ty+12;rr(X(17),Y(py),230*k,34.7*k,0,'slot');slotLabel(X(17),Y(py),230*k,34.7*k,'Fare slot · hug','l');
+ rr(X(17),Y(py+34.7+8),230*k,46.8*k,0,'slot');slotLabel(X(17),Y(py+42.7),230*k,46.8*k,'Title slot · ≤ 2 lines','l');
+ rr(X(17),Y(py+97.5),230*k,21.7*k,0,'slot');slotLabel(X(17),Y(py+97.5),230*k,21.7*k,'Facts · wraps','l');
+ nb(X(W-14),Y(30),1);nb(X(112),Y(23),2);nb(X(W-10),Y(by+26),3);nb(X(W-10),Y(py+66),4);
+ const t=Y(-24);dimH(X(0),X(W),Y(-48),Y(-4),Y(-4),'W');tx(X(W/2),Y(-62),'W = FILL OF GRID COLUMN · REF 264','dts',{'text-anchor':'middle'});
+ dimH(X(1),X(17),Y(H+22),Y(H),Y(H-16),'S3',{below:true});dimH(X(17),X(247),Y(H+22),null,Y(H-16),'FILL',{below:true,c:'dts'});dimH(X(247),X(263),Y(H+22),Y(H-16),Y(H),'S3',{below:true});
+ dimH(X(1),X(13),t,Y(1),Y(13),'S1',{dx:-10});dimH(X(13),X(107.3),t,null,Y(13),'HUG',{c:'dts'});
+ const lx=X(-40);dimV(Y(1),Y(1+HP),lx,X(0),X(0),'HP');dimV(Y(by),Y(ty),lx,X(0),X(0),'HB');dimV(Y(ty),Y(H-1),lx,X(0),X(0),'HUG',{c:'dts'});
+ dimV(Y(0),Y(H),X(-78),X(-44),X(-44),'(REF '+H.toFixed(0)+')');
+ const rx=X(W+30);[[by,by+12,'S2'],[by+12,by+39.7,'LH2'],[by+39.7,ty,'S2'],[ty,py,'S2'],[py+34.7,py+42.7,'S5'],[py+89.5,py+97.5,'S5'],[py+119.2,H-1,'S3']].forEach(([a,b,l])=>dimV(Y(a),Y(b),rx,X(W),X(W),l,{side:'r'}));
+ rad(X(0),Y(H),6*k,'bl','R1',22);
+ detailRef(X(60),Y(24),40,'DETAIL A',X(-30),Y(-30));
+ title(X(W/2),Y(H+52),'Plan view','Scale 1.35:1 · reference W = 264');}
+/* layer stack (simple exploded) */
+{const sc=.42,TX=250,TY=790,gap=64,a=.94*sc,b=.17*sc,c=-.34*sc,dd=.47*sc;
+ const P=(x,y,z)=>[TX+a*x+c*y,TY+b*x+dd*y-z];const G=z=>mk('g',{transform:'matrix('+a+','+b+','+c+','+dd+','+TX+','+(TY-z)+')'});
+ const R2=(g,x,y,w,h,r,cls,ex)=>mk('rect',Object.assign({x,y,width:w,height:h,rx:r,class:cls,'vector-effect':'non-scaling-stroke'},ex||{}),g);
+ let g=G(0);R2(g,-20,-20,W+40,H+40,0,'thin');
+ g=G(gap);R2(g,0,2,W,H,6,'hs',{fill:hat()});
+ g=G(gap*2);R2(g,0,0,W,H,6,'obj');
+ g=G(gap*3);R2(g,1,1,W-2,HP,0,'well');R2(g,1,1+HP,W-2,HB,0,'hug');
+ g=G(gap*4);R2(g,13,13,94,21,2,'hug');R2(g,17,1+HP+HB+12,230,34.7,0,'slot');R2(g,17,1+HP+HB+55,230,46.8,0,'slot');
+ const LX=200;[[0,[-20,H+20],'L0 · Ground','Surface token'],[gap,[0,H],'L1 · Hover shadow','Shadow-1 · lift Y 2'],[gap*2,[0,H],'L2 · Plate','B · R1 · clip'],[gap*3,[1,1+HP+HB],'L3 · Photo + board','4:3 frame · ink strip'],[gap*4,[17,H-30],'L4 · Slots','Avail · fare · title · facts']].forEach(([z,[x,y],t,st])=>{const p=P(x,y,z);mk('circle',{cx:p[0],cy:p[1],r:1.8,class:'dot'});mk('polyline',{points:p[0]+','+p[1]+' '+(LX+10)+','+p[1]+' '+LX+','+p[1],class:'lead'});tx(LX-4,p[1]-2,t,'vt',{'text-anchor':'end'});tx(LX-4,p[1]+11,st,'dts',{'text-anchor':'end'})});
+ title(330,TY+150,'Layer stack','Axonometric · z gaps not to scale');}
+/* Detail A: availability plate 3:1 */
+{const q=3,DX=640,DY=880;rr(DX,DY,94.3*q,21*q,2*q,'hug');
+ mk('circle',{cx:DX+(8+4)*q,cy:DY+10.5*q,r:4*q,class:'thin'});rr(DX+(8+8+6)*q,DY+4*q,64*q,13*q,0,'slot');slotLabel(DX+22*q,DY+4*q,64*q,13*q,'Label slot · hug');
+ dimH(DX,DX+8*q,DY-16,DY,DY+4*q,'S7',{dx:-6});dimH(DX+16*q,DX+22*q,DY-16,null,DY+4*q,'S8',{dx:6});
+ dimV(DY,DY+4*q,DX+94.3*q+20,DX+94.3*q,DX+94.3*q,'S9',{side:'r'});dimV(DY,DY+21*q,DX-26,DX,DX,'HA');
+ rad(DX+94.3*q,DY+21*q,2*q,'br','R2',18);tx(DX+12*q,DY+21*q+18,'DOT Ø Z1','dts',{'text-anchor':'middle'});
+ title(DX+141,DY+112,'Detail A · availability plate','Scale 3:1 · label + dot, never colour alone');}
+/* grid detail */
+{const s=.32,GX=1080,GY=850;[0,1,2].forEach(i=>rr(GX+i*(264+20)*s,GY,264*s,H*s,6*s,'obj'));
+ dimH(GX+264*s,GX+284*s,GY-14,GY,GY,'G');dimH(GX,GX+832*s,GY+H*s+18,GY+H*s,GY+H*s,'832 · 3 COL @ XL',{below:true,c:'dts'});
+ title(GX+133,GY+H*s+44,'Grid','Scale 0.32:1 · 1 / 2 / 3 columns at < 640 / 640 / 1280');}
+{let y=table(1426,86,'Spacing',[['S1','avail-inset','12'],['S2','board-pad-y','12'],['S3','plate-pad-x','16'],['S5','stack-gap','8'],['S7','avail-pad-x','8'],['S8','dot-gap','6 (micro)'],['S9','avail-pad-y','4'],['G','grid-gap','20']]);
+ y=table(1426,y,'Size',[['W','plate-w','FILL · 264'],['B','border','1'],['HP','photo-h','(W−2B)·¾ = 196.5'],['LH2','board-line','27.7'],['HB','board-h','2·S2+LH2 = 51.7'],['HA','avail-h','21'],['Z1','dot','8']]);
+ y=table(1426,y,'Radius',[['R1','r-plate','6'],['R2','r-avail','2']]);
+ table(1426,y,'Motion',[['Y','hover-lift','2'],['T','dur-2','200 ms'],['E','ease-out','expo']]);}
+})();
+</script>
+</body>
+</html>

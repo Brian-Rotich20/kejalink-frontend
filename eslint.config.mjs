@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Design documentation (spec-sheet drawing kit), not app code.
+    "docs/**",
+    "playwright-report/**",
+    "test-results/**",
   ]),
 ]);
 

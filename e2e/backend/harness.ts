@@ -7,6 +7,8 @@
  * Refuses to start unless the database name contains "test". Never point it at a real database.
  */
 import { randomBytes, randomUUID } from "node:crypto";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -50,13 +52,28 @@ Object.assign(process.env, {
 // The migrator resolves its folder from the working directory.
 process.chdir(backendDir);
 
-/** Cloudinary's public demo images: real JPEGs on res.cloudinary.com, so the frontend loader works. */
-const DEMO_IMAGES = [
-  "https://res.cloudinary.com/demo/image/upload/sample.jpg",
-  "https://res.cloudinary.com/demo/image/upload/v1/samples/landscapes/architecture-signs.jpg",
-  "https://res.cloudinary.com/demo/image/upload/v1/samples/landscapes/beach-boat.jpg",
-];
-let uploaded = 0;
+/**
+ * Fake image host: uploads are kept on local disk and served back by this harness under
+ * /api/dev-files/*, so the app shows exactly the photo that was uploaded (same origin, through
+ * the app's /api proxy). Local development and tests only; production uses Cloudinary.
+ */
+const filesDir = path.join(os.tmpdir(), "kejalink-e2e-uploads");
+mkdirSync(filesDir, { recursive: true });
+const filesOrigin = (process.env.E2E_FILES_ORIGIN ?? "http://localhost:3100").replace(/\/+$/, "");
+
+type DevFileRequest = { params: { name: string } };
+type DevFileReply = {
+  type(value: string): DevFileReply;
+  header(key: string, value: string): DevFileReply;
+  code(status: number): DevFileReply;
+  send(body: unknown): unknown;
+};
+
+const sniff = (buf: Buffer): { ext: string; type: string } => {
+  if (buf[0] === 0x89 && buf[1] === 0x50) return { ext: "png", type: "image/png" };
+  if (buf.subarray(8, 12).toString("ascii") === "WEBP") return { ext: "webp", type: "image/webp" };
+  return { ext: "jpg", type: "image/jpeg" };
+};
 
 async function main() {
   const { runMigrations } = await import(pathToFileURL(path.join(backendDir, "src/scripts/migrate.ts")).href);
@@ -69,12 +86,14 @@ async function main() {
   await runMigrations();
 
   setImageStorage({
-    async upload() {
-      const url = DEMO_IMAGES[uploaded % DEMO_IMAGES.length] as string;
-      uploaded += 1;
-      return { publicId: `e2e/${randomUUID()}`, url };
+    async upload(buffer: Buffer) {
+      const name = `${randomUUID()}.${sniff(buffer).ext}`;
+      writeFileSync(path.join(filesDir, name), buffer);
+      return { publicId: `e2e/${name}`, url: `${filesOrigin}/api/dev-files/${name}` };
     },
-    async delete() {},
+    async delete(publicId: string) {
+      rmSync(path.join(filesDir, path.basename(publicId)), { force: true });
+    },
   });
 
   if (process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD) {
@@ -87,6 +106,15 @@ async function main() {
   }
 
   const app = await buildApp({ rateLimitMax: 10_000 });
+  app.get("/api/dev-files/:name", async (request: DevFileRequest, reply: DevFileReply) => {
+    const name = path.basename(request.params.name);
+    try {
+      const buf = readFileSync(path.join(filesDir, name));
+      return reply.type(sniff(buf).type).header("cache-control", "public, max-age=3600").send(buf);
+    } catch {
+      return reply.code(404).send({ success: false, error: { code: "NOT_FOUND", message: "No such file", details: null } });
+    }
+  });
   await app.listen({ port, host: "127.0.0.1" });
   console.log(`E2E API ready on http://127.0.0.1:${port} (database ${dbName}, fake image host)`);
 

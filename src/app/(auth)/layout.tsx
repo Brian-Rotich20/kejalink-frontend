@@ -11,14 +11,14 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
             <p className="board-type text-step-4">
               One request.
               <br />
-              <span className="text-band">One clear answer.</span>
+              <span className="text-on-board-2">One clear answer.</span>
             </p>
             <p className="measure text-on-board-2">
               Every viewing request on KejaLink is Pending until the person listing says yes or no. Confirm
               one, and the place shows as taken for everyone else.
             </p>
             <p className="flex items-center gap-2 font-bold">
-              <ShieldCheck aria-hidden className="size-5 text-band" />
+              <ShieldCheck aria-hidden className="size-5 text-on-board-2" />
               Pay only after you&apos;ve viewed the house.
             </p>
           </aside>
