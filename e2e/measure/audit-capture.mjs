@@ -13,7 +13,7 @@ const stamp = Date.now().toString(36);
 async function api(ctx, method, path, body) {
   const res = await ctx.request.fetch(`${base}/api${path}`, {
     method,
-    headers: { origin: base, "content-type": "application/json" },
+    headers: body === undefined ? { origin: base } : { origin: base, "content-type": "application/json" },
     data: body === undefined ? undefined : JSON.stringify(body),
   });
   if (!res.ok()) throw new Error(`${method} ${path} → ${res.status()} ${(await res.text()).slice(0, 200)}`);
