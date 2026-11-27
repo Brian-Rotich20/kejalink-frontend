@@ -205,7 +205,7 @@ export default function LandingPage() {
               is shared only with the person you confirm.
             </p>
           </div>
-          <Button asChild size="lg" className="justify-self-start border-0 bg-paper text-primary hover:bg-primary-soft">
+          <Button asChild size="lg" className="justify-self-start border-0 bg-paper text-primary-text hover:bg-primary-soft">
             <Link href="/register?as=tenant">List your place</Link>
           </Button>
         </div>

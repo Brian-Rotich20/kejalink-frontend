@@ -22,7 +22,8 @@ try {
   for (const width of widths) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     for (const route of routes) {
-      await page.goto(base + route, { waitUntil: "networkidle" });
+      await page.goto(base + route, { waitUntil: "load" });
+      await page.waitForTimeout(1500);
       await page.evaluate(() => document.fonts.ready);
       // Scroll through once so lazy images load before the full-page capture.
       await page.evaluate(async () => {
@@ -32,7 +33,7 @@ try {
         }
         window.scrollTo(0, 0);
       });
-      await page.waitForLoadState("networkidle");
+      await page.waitForTimeout(1500);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       const slug = route === "/" ? "home" : route.replace(/^\//, "").replace(/[^a-z0-9]+/gi, "-");
       const file = path.join(outDir, `${slug}-${width}.png`);

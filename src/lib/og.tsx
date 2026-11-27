@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 
 export const OG_SIZE = { width: 1200, height: 630 };
+/** Share-image colours (orange reference): white ground, dark text, orange marks. */
 export const OG = {
-  board: "#100f0d",
-  board2: "#22221f",
-  band: "#fbd034",
-  white: "#fafaf9",
-  muted: "#c5c4c0",
+  board: "#ffffff",
+  board2: "#f4f4f5",
+  band: "#fe5c2b",
+  white: "#1f1f1f",
+  muted: "#5d5d5d",
 };
 
 /** The two-plate wordmark, drawn for ImageResponse (flexbox only). */
