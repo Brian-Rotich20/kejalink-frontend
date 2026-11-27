@@ -18,7 +18,7 @@ export function NavLink({ item, onClick, large }: { item: NavItem; onClick?: () 
       className={cn(
         "relative inline-flex min-h-11 items-center px-1 font-medium text-ink-2 transition-colors hover:text-ink",
         // R1: the current section in bold primary green.
-        "aria-[current=page]:font-bold aria-[current=page]:text-primary",
+        "aria-[current=page]:font-bold aria-[current=page]:text-primary-text",
         large ? "w-full border-b border-line py-3 text-step-2 font-bold text-ink" : "text-step--1",
       )}
     >

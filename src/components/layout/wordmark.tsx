@@ -22,7 +22,7 @@ export function Wordmark({
         className={cn(
           "grid place-items-center rounded-sm",
           lg ? "size-11" : "size-8",
-          tone === "primary" ? "bg-primary text-on-primary" : "bg-paper text-primary",
+          tone === "primary" ? "bg-primary text-on-primary" : "bg-paper text-primary-text",
         )}
       >
         <House className={lg ? "size-6" : "size-[1.1rem]"} strokeWidth={2.4} />

@@ -16,8 +16,9 @@ export type Bounds = { north: number; south: number; east: number; west: number 
 type Pinned = PropertyListItem & { latitude: number; longitude: number };
 
 const NAIROBI: [number, number] = [-1.2864, 36.8172];
-const ACCENT = "#f26a21";
-const PRIMARY = "#095650";
+const ACCENT = "#fe5c2b";
+/** The selected pin: the deeper orange, so it stands out from the rest. */
+const PRIMARY = "#c2410c";
 
 export const hasPin = (p: PropertyListItem): p is Pinned =>
   typeof p.latitude === "number" && typeof p.longitude === "number";
@@ -210,7 +211,7 @@ export default function ListingMap({
             <p className="truncate text-step--3 text-ink-3">
               {selected.area} · {factsLine(selected)}
             </p>
-            <p className="text-primary">
+            <p className="text-ink">
               <span className="figure text-step-0">KES {formatAmount(selected.priceAmount)}</span>
               <span className="text-step--2 font-medium">/month</span>
             </p>

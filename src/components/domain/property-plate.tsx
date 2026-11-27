@@ -102,7 +102,7 @@ function FactChips({ property, className }: { property: PropertyListItem; classN
 
 function Price({ amount, size = "md" }: { amount: number; size?: "md" | "lg" }) {
   return (
-    <p className="whitespace-nowrap text-primary">
+    <p className="whitespace-nowrap text-ink">
       <span className={cn("figure", size === "lg" ? "text-step-1" : "text-step-0")}>KES {formatAmount(amount)}</span>
       <span className="text-step--2 font-medium">/month</span>
     </p>

@@ -3,39 +3,41 @@
 /*
  * KejaLink design tokens, derived from the supplied reference screens
  * (docs/design/REFERENCE-SPECIFICATION.md): white surfaces on a very light grey ground, one deep
- * teal-green for primary actions and prices, an orange accent for map pins and saved items,
+ * orange (#fe5c2b) for actions, selection, pins and saved items; prices and titles in dark ink,
  * DM Sans throughout. Components use only the semantic names below.
  */
 
 :root {
   color-scheme: light;
 
-  /* Ground and surfaces */
-  --ground: #f6f7f8; /* the page (R1 list background, R2 page) */
-  --paper: #ffffff; /* cards, panels, inputs, header */
-  --sunk: #edf3f4; /* idle tiles, chips, image placeholders (R1 idle type tile) */
-  --line: #e4e7ea; /* card and section borders */
-  --line-strong: #858e93; /* form-control borders: 3:1 on white */
+  /* Ground and surfaces: white panels on a near-white neutral ground (orange reference) */
+  --ground: #f7f7f8;
+  --paper: #ffffff;
+  --sunk: #f4f4f5; /* idle tiles, chips, slider track, image placeholders */
+  --line: #ececee;
+  --line-strong: #8a8a90; /* form-control borders: 3:1 on white */
 
-  /* Ink */
-  --ink: #1f2427;
-  --ink-2: #4b5458;
-  --ink-3: #6b7378; /* meta text: 4.6:1 on the ground */
+  /* Ink: neutral, as in the reference titles and meta */
+  --ink: #1f1f1f;
+  --ink-2: #5d5d5d;
+  --ink-3: #6b6b6b; /* meta text: 4.6:1 on the ground */
 
-  /* Primary: R1 teal green (selected tiles, buttons, prices) */
-  --primary: #095650;
-  --primary-hover: #07463f;
-  --primary-press: #053a34;
-  --primary-soft: #e3efed;
+  /* Primary: the reference orange, for actions and selection (buttons, checkboxes, slider, tiles) */
+  --primary: #fe5c2b;
+  --primary-hover: #ef4f1f;
+  --primary-press: #dc4514;
+  --primary-soft: #fff0ea;
+  /* Orange as small text (links, the current nav item): deepened to pass AA on white (5.2:1) */
+  --primary-text: #c2410c;
   --on-primary: #ffffff;
-  --on-primary-2: #cfe3df;
+  --on-primary-2: #ffe3d8;
 
-  /* Accent: orange for pins, saved marks and active pills (R1, R2). Text uses accent-text (AA). */
-  --accent: #f26a21;
-  --accent-text: #c4500f;
-  --accent-soft: #fdeee5;
+  /* Accent: the same orange for pins and saved marks */
+  --accent: #fe5c2b;
+  --accent-text: #c2410c;
+  --accent-soft: #fff0ea;
 
-  --focus: #095650;
+  --focus: #fe5c2b;
 
   /* Semantic feedback */
   --success: #1f7a4d;
@@ -54,8 +56,8 @@
   --status-confirmed-soft: var(--success-soft);
   --status-rejected: var(--danger);
   --status-rejected-soft: var(--danger-soft);
-  --status-cancelled: #59636a;
-  --status-cancelled-soft: #eef0f2;
+  --status-cancelled: #5d5d5d;
+  --status-cancelled-soft: #f1f1f2;
   /* Listing moderation */
   --status-published: var(--success);
   --status-published-soft: var(--success-soft);
@@ -106,10 +108,10 @@
   --surface-2: var(--paper);
   --surface-sunk: var(--sunk);
   --board: var(--ink);
-  --board-2: #2c3337;
-  --board-line: #3a4247;
+  --board-2: #2b2b2b;
+  --board-line: #3a3a3a;
   --on-board: #ffffff;
-  --on-board-2: #c9d0d4;
+  --on-board-2: #cfcfcf;
 }
 
 @theme inline {
@@ -125,6 +127,7 @@
   --color-primary-hover: var(--primary-hover);
   --color-primary-press: var(--primary-press);
   --color-primary-soft: var(--primary-soft);
+  --color-primary-text: var(--primary-text);
   --color-on-primary: var(--on-primary);
   --color-on-primary-2: var(--on-primary-2);
   --color-accent: var(--accent);
@@ -296,12 +299,12 @@
     max-width: var(--measure);
   }
 
-  /* Links: primary text, an underline that firms up on hover. */
+  /* Links: orange text (AA-safe shade), an underline that firms up on hover. */
   .link {
-    color: var(--primary);
+    color: var(--primary-text);
     font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: color-mix(in srgb, var(--primary) 40%, transparent);
+    text-decoration-color: color-mix(in srgb, var(--primary-text) 40%, transparent);
     transition: text-decoration-color var(--dur-1) var(--ease-out);
   }
   .link:hover {

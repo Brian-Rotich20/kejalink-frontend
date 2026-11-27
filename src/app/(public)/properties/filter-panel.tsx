@@ -222,7 +222,7 @@ function CheckRow({ label, checked, onChange }: { label: string; checked: boolea
       >
         {checked ? <Check className="size-3.5" strokeWidth={3} /> : null}
       </span>
-      <span className={checked ? "font-medium text-primary" : "text-ink-2"}>{label}</span>
+      <span className={checked ? "font-medium text-primary-text" : "text-ink-2"}>{label}</span>
     </label>
   );
 }
