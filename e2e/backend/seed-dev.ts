@@ -54,6 +54,28 @@ const LISTINGS = [
 ] as const;
 
 /**
+ * Approximate neighbourhood centres for the sample pins (not real addresses). The last sample has
+ * no pin, to show how the map explains listings without one.
+ */
+const PINS: ([number, number] | null)[] = [
+  [-1.1856, 36.9246],
+  [-1.2925, 36.7855],
+  [-1.2747, 36.8259],
+  [-1.2934, 36.788],
+  [-1.3105, 36.837],
+  null,
+];
+
+const AMENITIES = [
+  ["Water 24/7", "Token electricity", "Security guard"],
+  ["Parking", "Balcony", "Water 24/7", "Wi-Fi ready"],
+  ["Water 24/7", "Near the stage"],
+  ["Fitted kitchen", "Parking", "Security guard", "Wi-Fi ready"],
+  ["Gated", "Parking", "Security guard", "Pets allowed"],
+  ["Water 24/7", "Token electricity", "Near the stage"],
+];
+
+/**
  * Photos for local review only, downloaded at seed time (never committed or shipped). Unsplash
  * licence; credits: Cytonn Photography (Nairobi), deborah cortelazzi, Patrick Perkins, Clay Banks,
  * Naomi Hébert, Frames For Your Heart. Production listings carry only their listers' own photos.
@@ -92,7 +114,8 @@ async function main() {
         bathrooms,
         county,
         area,
-        amenities: ["Water 24/7", "Token electricity", "Security guard"],
+        amenities: AMENITIES[index],
+        ...(PINS[index] ? { latitude: PINS[index][0], longitude: PINS[index][1] } : {}),
       },
     });
     const id = (body.data as { id: string }).id;

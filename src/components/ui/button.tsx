@@ -4,13 +4,13 @@ import { Slot } from "radix-ui";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
-const primary = "bg-forest text-on-forest hover:bg-forest-hover active:bg-forest-press";
+const primary = "bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-press";
 const secondary = "border border-line-strong bg-paper text-ink hover:border-ink";
 
 export const buttonVariants = cva(
   [
     "relative inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none",
-    "rounded-sm transition-[background-color,border-color,color,scale] duration-(--dur-1) ease-out",
+    "rounded-md transition-[background-color,border-color,color,scale] duration-(--dur-1) ease-out",
     "active:scale-[0.98] motion-reduce:active:scale-100",
     "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
     "[&_svg]:size-[1.1em] [&_svg]:shrink-0",
@@ -18,9 +18,9 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        /** The main action in a region: forest. */
+        /** The main action in a region: solid primary green (R1 "Ok", R3 "Search"). */
         primary,
-        /** Everything else that matters: an ivory button with a firm outline. */
+        /** Everything else that matters: white with a firm outline. */
         secondary,
         ghost: "text-ink hover:bg-sunk",
         danger: "bg-danger text-paper hover:brightness-95",

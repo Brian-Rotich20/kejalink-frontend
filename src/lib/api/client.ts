@@ -3,7 +3,7 @@ import { publicEnv } from "@/lib/env/public";
 import { type Envelope, parseEnvelope, readJson } from "./envelope";
 import { ApiError, FRIENDLY, NETWORK_ERROR, TIMEOUT } from "./errors";
 
-type Method = "GET" | "POST" | "PATCH" | "DELETE";
+type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export type ApiFetchOptions<S extends z.ZodType> = {
   schema: S;

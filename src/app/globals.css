@@ -1,51 +1,51 @@
 @import "tailwindcss";
 
 /*
- * KejaLink — "Nairobi Urban Living".
- * An editorial property publication: Nairobi building-stone ground, ivory paper, charcoal ink,
- * Karura-forest green for the brand and its actions, murram (red laterite) for the rare accent.
- * Every colour is OKLCH; components use only the semantic names below.
+ * KejaLink design tokens, derived from the supplied reference screens
+ * (docs/design/REFERENCE-SPECIFICATION.md): white surfaces on a very light grey ground, one deep
+ * teal-green for primary actions and prices, an orange accent for map pins and saved items,
+ * DM Sans throughout. Components use only the semantic names below.
  */
 
 :root {
   color-scheme: light;
 
-  /* Ground and paper */
-  --ground: oklch(0.955 0.011 84); /* limestone: the page */
-  --paper: oklch(0.985 0.007 88); /* ivory: raised surfaces, inputs, sheets */
-  --sunk: oklch(0.928 0.012 82); /* recessed wells, image placeholders */
-  --line: oklch(0.87 0.012 80); /* hairlines between things */
-  --line-strong: oklch(0.6 0.014 75); /* control borders (>= 3:1 on ground) */
+  /* Ground and surfaces */
+  --ground: #f6f7f8; /* the page (R1 list background, R2 page) */
+  --paper: #ffffff; /* cards, panels, inputs, header */
+  --sunk: #edf3f4; /* idle tiles, chips, image placeholders (R1 idle type tile) */
+  --line: #e4e7ea; /* card and section borders */
+  --line-strong: #858e93; /* form-control borders: 3:1 on white */
 
-  /* Ink (warm charcoal, not tinted black) */
-  --ink: oklch(0.25 0.012 65);
-  --ink-2: oklch(0.4 0.012 65);
-  --ink-3: oklch(0.49 0.012 65);
+  /* Ink */
+  --ink: #1f2427;
+  --ink-2: #4b5458;
+  --ink-3: #6b7378; /* meta text: 4.6:1 on the ground */
 
-  /* Brand: Karura forest */
-  --forest: oklch(0.4 0.075 158);
-  --forest-hover: oklch(0.35 0.072 158);
-  --forest-press: oklch(0.31 0.068 158);
-  --forest-soft: oklch(0.935 0.025 150);
-  --on-forest: oklch(0.985 0.007 88);
-  --on-forest-2: oklch(0.86 0.025 150);
+  /* Primary: R1 teal green (selected tiles, buttons, prices) */
+  --primary: #095650;
+  --primary-hover: #07463f;
+  --primary-press: #053a34;
+  --primary-soft: #e3efed;
+  --on-primary: #ffffff;
+  --on-primary-2: #cfe3df;
 
-  /* Accent: murram, used sparingly (selected states, one editorial mark per screen) */
-  --clay: oklch(0.52 0.115 42);
-  --clay-soft: oklch(0.935 0.03 50);
+  /* Accent: orange for pins, saved marks and active pills (R1, R2). Text uses accent-text (AA). */
+  --accent: #f26a21;
+  --accent-text: #c4500f;
+  --accent-soft: #fdeee5;
 
-  /* Focus: forest ring, offset onto the ground so it reads on any fill */
-  --focus: oklch(0.4 0.075 158);
+  --focus: #095650;
 
   /* Semantic feedback */
-  --success: oklch(0.45 0.1 150);
-  --success-soft: oklch(0.935 0.035 150);
-  --warning: oklch(0.5 0.1 65);
-  --warning-soft: oklch(0.94 0.045 85);
-  --danger: oklch(0.5 0.16 28);
-  --danger-soft: oklch(0.94 0.03 30);
-  --info: oklch(0.45 0.06 230);
-  --info-soft: oklch(0.94 0.015 230);
+  --success: #1f7a4d;
+  --success-soft: #e4f3ea;
+  --warning: #8a5a00;
+  --warning-soft: #fdf3dc;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --info: #1d5a8a;
+  --info-soft: #e7f0f8;
 
   /* Booking states (always with a label and an icon) */
   --status-pending: var(--warning);
@@ -54,23 +54,24 @@
   --status-confirmed-soft: var(--success-soft);
   --status-rejected: var(--danger);
   --status-rejected-soft: var(--danger-soft);
-  --status-cancelled: oklch(0.45 0.01 70);
-  --status-cancelled-soft: oklch(0.925 0.008 80);
+  --status-cancelled: #59636a;
+  --status-cancelled-soft: #eef0f2;
   /* Listing moderation */
   --status-published: var(--success);
   --status-published-soft: var(--success-soft);
   --status-moderated: var(--danger);
   --status-moderated-soft: var(--danger-soft);
 
-  /* Elevation: overlays only. Everything else separates with hairlines. */
-  --shadow-1: 0 1px 2px oklch(0.25 0.012 65 / 0.06);
-  --shadow-2: 0 12px 32px oklch(0.25 0.012 65 / 0.16), 0 2px 6px oklch(0.25 0.012 65 / 0.08);
-  --scrim: oklch(0.22 0.012 65 / 0.5);
+  /* Elevation: grid cards and floating map cards (R3), overlays */
+  --shadow-1: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.08);
+  --shadow-2: 0 12px 32px rgb(16 24 40 / 0.16), 0 2px 6px rgb(16 24 40 / 0.08);
+  --scrim: rgb(16 24 40 / 0.5);
 
-  /* Radius: small and quiet */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  /* Radius: chips and inputs 6, cards and buttons 8, map and large panels 12 */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-pill: 999px;
 
   /* Motion: answers to actions only */
@@ -80,58 +81,35 @@
   --dur-2: 180ms;
   --dur-3: 240ms;
 
-  /* Type scale: 1.25 (major third) for UI, fluid display steps for editorial headings */
+  /* Type scale (px): 12, 13, 14, 16, 18, 22, 28, 36, then two fluid hero steps */
+  --step--3: 0.75rem;
+  --step--2: 0.8125rem;
   --step--1: 0.875rem;
   --step-0: 1rem;
   --step-1: 1.125rem;
-  --step-2: clamp(1.25rem, 1.18rem + 0.3vw, 1.4rem);
-  --step-3: clamp(1.5rem, 1.36rem + 0.6vw, 1.875rem);
-  --step-4: clamp(1.875rem, 1.6rem + 1.2vw, 2.5rem);
-  --step-5: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
-  --step-6: clamp(2.6rem, 1.9rem + 3.1vw, 4.5rem);
+  --step-2: 1.375rem;
+  --step-3: 1.75rem;
+  --step-4: 2.25rem;
+  --step-5: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+  --step-6: clamp(2.25rem, 1.7rem + 2.4vw, 3.25rem);
 
-  --wrap: 75rem;
+  --wrap: 80rem;
   --measure: 66ch;
   --gutter: clamp(1rem, 0.6rem + 1.8vw, 2rem);
-  --header-h: 4rem;
+  --header-h: 4.5rem;
 
   /*
-   * Transitional aliases: the previous identity's token names, re-pointed at the new system so
-   * screens not yet redesigned stay coherent. Removed once every screen uses the names above.
+   * Transitional aliases for screens not yet rebuilt (dark "board" panels of the first identity).
+   * Removed once every screen uses the names above.
    */
   --surface: var(--ground);
   --surface-2: var(--paper);
   --surface-sunk: var(--sunk);
   --board: var(--ink);
-  --board-2: oklch(0.32 0.012 65);
-  --board-line: oklch(0.38 0.012 65);
-  --on-board: var(--paper);
-  --on-board-2: oklch(0.82 0.01 80);
-  --band: var(--forest);
-  --band-hover: var(--forest-hover);
-  --band-press: var(--forest-press);
-  --on-band: var(--on-forest);
-  --accent: var(--forest);
-}
-
-/* Dark tokens are prepared, not shipped (light theme first; dark ships after every gate passes). */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --ground: oklch(0.2 0.01 70);
-  --paper: oklch(0.24 0.01 70);
-  --sunk: oklch(0.17 0.01 70);
-  --line: oklch(0.33 0.01 70);
-  --line-strong: oklch(0.55 0.012 70);
-  --ink: oklch(0.94 0.008 85);
-  --ink-2: oklch(0.82 0.01 80);
-  --ink-3: oklch(0.72 0.01 80);
-  --forest: oklch(0.7 0.09 155);
-  --forest-hover: oklch(0.75 0.09 155);
-  --forest-press: oklch(0.66 0.09 155);
-  --forest-soft: oklch(0.3 0.04 155);
-  --on-forest: oklch(0.18 0.01 70);
-  --clay: oklch(0.72 0.11 45);
-  --focus: oklch(0.75 0.09 155);
+  --board-2: #2c3337;
+  --board-line: #3a4247;
+  --on-board: #ffffff;
+  --on-board-2: #c9d0d4;
 }
 
 @theme inline {
@@ -143,14 +121,15 @@
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
-  --color-forest: var(--forest);
-  --color-forest-hover: var(--forest-hover);
-  --color-forest-press: var(--forest-press);
-  --color-forest-soft: var(--forest-soft);
-  --color-on-forest: var(--on-forest);
-  --color-on-forest-2: var(--on-forest-2);
-  --color-clay: var(--clay);
-  --color-clay-soft: var(--clay-soft);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-press: var(--primary-press);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-2: var(--on-primary-2);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-soft: var(--accent-soft);
   --color-focus: var(--focus);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
@@ -170,16 +149,11 @@
   --color-on-board: var(--on-board);
   --color-on-board-2: var(--on-board-2);
   --color-board-line: var(--board-line);
-  --color-band: var(--band);
-  --color-band-hover: var(--band-hover);
-  --color-band-press: var(--band-press);
-  --color-on-band: var(--on-band);
-  --color-accent: var(--accent);
 
   --font-sans: var(--font-text), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-editorial), Georgia, "Times New Roman", serif;
-  --font-display: var(--font-serif);
 
+  --text-step--3: var(--step--3);
+  --text-step--2: var(--step--2);
   --text-step--1: var(--step--1);
   --text-step-0: var(--step-0);
   --text-step-1: var(--step-1);
@@ -192,6 +166,7 @@
   --radius-xs: var(--radius-xs);
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
   --radius-pill: var(--radius-pill);
 
   --shadow-1: var(--shadow-1);
@@ -214,14 +189,14 @@
     font-family: var(--font-sans);
     font-size: var(--step-0);
     line-height: 1.55;
-    caret-color: var(--forest);
+    caret-color: var(--primary);
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
   }
 
   ::selection {
-    background: var(--forest);
-    color: var(--on-forest);
+    background: var(--primary);
+    color: var(--on-primary);
   }
 
   :focus-visible {
@@ -230,10 +205,10 @@
     border-radius: var(--radius-xs);
   }
 
-  /* On dark (charcoal or forest) panels the ring switches to ivory so it stays visible. */
+  /* On dark or primary panels the ring switches to white so it stays visible. */
   .on-board :focus-visible,
   .on-board:focus-visible,
-  .on-forest :focus-visible {
+  .on-primary :focus-visible {
     outline-color: var(--paper);
   }
 
@@ -242,7 +217,8 @@
   h3,
   h4 {
     text-wrap: balance;
-    line-height: 1.15;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
   }
 
   p,
@@ -276,43 +252,35 @@
 }
 
 @layer components {
-  /* Editorial voice: Newsreader at display optical size, quiet weight, sentence case. */
+  /* Headings: DM Sans bold, tight (R2 place title, R1 card titles). */
   .display {
-    font-family: var(--font-serif);
-    font-optical-sizing: auto;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    line-height: 1.04;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.08;
   }
 
   .headline {
-    font-family: var(--font-serif);
-    font-optical-sizing: auto;
-    font-weight: 500;
-    letter-spacing: -0.012em;
-    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
   }
 
-  /* Money and counts: DM Sans figures, tabular, slightly tight. */
+  /* Money and counts: tabular figures, bold (R1 prices). */
   .figure {
-    font-family: var(--font-sans);
-    font-weight: 600;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
   }
 
-  /* Transitional: the previous condensed-caps classes now render in the editorial voice. */
+  /* Transitional: the first identity's condensed-caps classes. */
   .board-type {
-    font-family: var(--font-serif);
-    font-optical-sizing: auto;
-    font-weight: 500;
-    letter-spacing: -0.012em;
-    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
     font-variant-numeric: tabular-nums;
   }
 
   .board-type-wide {
-    font-family: var(--font-sans);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
@@ -328,18 +296,12 @@
     max-width: var(--measure);
   }
 
-  /* Transitional: the old decorative band rule becomes a plain hairline. */
-  .band-rule {
-    height: 1px;
-    background: var(--line);
-  }
-
-  /* Links: forest text, a hairline underline that firms up on hover. */
+  /* Links: primary text, an underline that firms up on hover. */
   .link {
-    color: var(--forest);
-    font-weight: 500;
+    color: var(--primary);
+    font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: color-mix(in oklch, var(--forest) 40%, transparent);
+    text-decoration-color: color-mix(in srgb, var(--primary) 40%, transparent);
     transition: text-decoration-color var(--dur-1) var(--ease-out);
   }
   .link:hover {
@@ -352,8 +314,8 @@
     top: 0.75rem;
     z-index: 100;
     transform: translateY(-200%);
-    background: var(--forest);
-    color: var(--on-forest);
+    background: var(--primary);
+    color: var(--on-primary);
     padding: 0.75rem 1rem;
     font-weight: 600;
     border-radius: var(--radius-sm);

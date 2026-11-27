@@ -187,7 +187,7 @@ function PhotoRow({
       <div className="grid min-w-0 flex-1 gap-1">
         <p className="font-bold">Photo {index + 1}</p>
         {image.isPrimary ? (
-          <p className="board-type-wide inline-flex w-fit items-center gap-1 rounded-xs bg-band px-1.5 py-0.5 text-[0.75rem] text-on-band">
+          <p className="board-type-wide inline-flex w-fit items-center gap-1 rounded-xs bg-primary px-1.5 py-0.5 text-[0.75rem] text-on-primary">
             <Star aria-hidden className="size-3" fill="currentColor" />
             Cover photo
           </p>

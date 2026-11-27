@@ -88,5 +88,20 @@ export const AMENITY_SUGGESTIONS = [
   "Pets allowed",
 ] as const;
 
+/**
+ * "Additional conveniences" offered as filters (reference R1). Each must match a suggestion above
+ * word for word: the API compares amenities exactly, ignoring case.
+ */
+export const AMENITY_FILTERS = [
+  "Parking",
+  "Water 24/7",
+  "Security guard",
+  "Gated",
+  "Wi-Fi ready",
+  "Furnished",
+  "Pets allowed",
+  "Balcony",
+] as const satisfies readonly (typeof AMENITY_SUGGESTIONS)[number][];
+
 /** Budget presets for the hero search (KES per month). */
 export const BUDGET_STEPS = [5_000, 8_000, 10_000, 15_000, 20_000, 30_000, 50_000, 80_000] as const;

@@ -45,7 +45,7 @@ export function AvailabilitySwitch({ id, isAvailable }: { id: string; isAvailabl
         className={cn(
           "relative inline-flex h-7 w-12 shrink-0 items-center rounded-pill border-2 transition-colors disabled:opacity-60",
           "before:absolute before:-inset-2 before:content-['']",
-          checked ? "border-ink bg-band" : "border-line-strong bg-surface-sunk",
+          checked ? "border-ink bg-primary" : "border-line-strong bg-surface-sunk",
         )}
       >
         <Switch.Thumb

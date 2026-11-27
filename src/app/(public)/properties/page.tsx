@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { createLoader } from "nuqs/server";
 import { Suspense } from "react";
-import { PropertyPlateSkeleton } from "@/components/domain/property-plate";
+import { ListingRowSkeleton } from "@/components/domain/property-plate";
 import { WakingNotice } from "@/components/layout/waking";
 import { searchListings } from "@/lib/api/public-data";
 import { filterParsers, normaliseFilters } from "@/lib/filters";
@@ -42,32 +42,23 @@ async function DiscoveryLoader({ searchParams }: { searchParams: PageProps<"/pro
 
 function DiscoveryFallback() {
   return (
-    <div className="grid gap-6 lg:grid-cols-[17.5rem_1fr] lg:gap-10">
-      <div aria-hidden className="hidden h-96 rounded-md bg-surface-sunk lg:block" />
-      <div className="grid content-start gap-5">
+    <div className="grid flex-1 lg:grid-cols-[17.5rem_1fr] xl:grid-cols-[18.75rem_minmax(26rem,32rem)_1fr]">
+      <div aria-hidden className="hidden border-r border-line bg-paper lg:block" />
+      <div className="grid content-start gap-3 p-4 md:p-6">
         <WakingNotice />
-        <ul aria-hidden className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 6 }, (_, i) => (
-            <li key={i}>
-              <PropertyPlateSkeleton />
-            </li>
-          ))}
-        </ul>
+        {Array.from({ length: 4 }, (_, i) => (
+          <ListingRowSkeleton key={i} />
+        ))}
       </div>
+      <div aria-hidden className="hidden bg-sunk xl:block" />
     </div>
   );
 }
 
+/** Discovery (references R1–R3): filters, results and the map fill the window under the header. */
 export default function PropertiesPage({ searchParams }: PageProps<"/properties">) {
   return (
-    <div className="wrap grid gap-6 pt-8 pb-0 md:pt-12 lg:pb-16">
-      <div className="grid gap-2">
-        <h1 className="board-type text-step-5">Places to rent</h1>
-        <p className="measure text-ink-2">
-          Every listing shows its monthly rent and whether it&apos;s still free. Taken places stay on the
-          board so you can see what goes fast.
-        </p>
-      </div>
+    <div className="flex flex-1 flex-col">
       <Suspense fallback={<DiscoveryFallback />}>
         <DiscoveryLoader searchParams={searchParams} />
       </Suspense>

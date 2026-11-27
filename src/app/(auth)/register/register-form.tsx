@@ -93,7 +93,7 @@ export function RegisterForm() {
                       checked ? "border-ink bg-ink" : "border-line-strong",
                     )}
                   >
-                    {checked ? <span className="size-2 rounded-pill bg-band" /> : null}
+                    {checked ? <span className="size-2 rounded-pill bg-primary" /> : null}
                   </span>
                 </span>
                 <span className="text-step-1 font-bold">{card.title}</span>

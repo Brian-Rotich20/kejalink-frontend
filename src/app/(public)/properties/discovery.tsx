@@ -1,18 +1,22 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { AlertTriangle, RotateCcw, SearchX, SlidersHorizontal } from "lucide-react";
+import { AlertTriangle, LayoutGrid, List, Map as MapIcon, RotateCcw, SearchX, SlidersHorizontal } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useQueryStates } from "nuqs";
-import { useId, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { z } from "zod";
-import { PropertyPlate, PropertyPlateSkeleton } from "@/components/domain/property-plate";
+import {
+  ListingRow,
+  ListingRowSkeleton,
+  PropertyPlate,
+  PropertyPlateSkeleton,
+} from "@/components/domain/property-plate";
 import { WakingNotice } from "@/components/layout/waking";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { controlClass, NativeSelect } from "@/components/ui/field";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Pagination } from "@/components/ui/pagination";
 import { StateBlock } from "@/components/ui/state";
-import { useDebouncedCallback } from "@/hooks/use-debounced";
 import { apiFetch } from "@/lib/api/client";
 import type { Envelope } from "@/lib/api/envelope";
 import { messageFor } from "@/lib/api/errors";
@@ -29,9 +33,17 @@ import {
   SORTS,
   type Sort,
   toApiQuery,
+  type View,
 } from "@/lib/filters";
 import { formatAmount, plural } from "@/lib/format";
-import { COUNTIES, PROPERTY_TYPE_LABEL, PROPERTY_TYPES, type PropertyType } from "@/lib/kenya";
+import { PROPERTY_TYPE_LABEL } from "@/lib/kenya";
+import { FilterPanel } from "./filter-panel";
+import type { Bounds } from "./listing-map";
+
+const ListingMap = dynamic(() => import("./listing-map"), {
+  ssr: false,
+  loading: () => <div aria-hidden className="size-full animate-[skeleton_1.6s_var(--ease-in-out)_infinite] bg-sunk" />,
+});
 
 type Listings = Envelope<PropertyListItem[]>;
 
@@ -39,375 +51,370 @@ const listingsSchema = z.array(propertyListItem);
 
 const sameFilters = (a: Filters, b: Filters) => JSON.stringify(a) === JSON.stringify(b);
 
+/** The view is not part of the query: switching views never refetches. */
+const queryFilters = (f: Filters): Filters => ({ ...f, view: "map" });
+
 function useDiscoveryQuery(filters: Filters, initial: { filters: Filters; data: Listings | null }) {
+  const key = queryFilters(filters);
   return useQuery({
-    queryKey: ["properties", "search", filters],
+    queryKey: ["properties", "search", key],
     queryFn: ({ signal }) =>
-      apiFetch("/properties", { schema: listingsSchema, query: toApiQuery(filters, PAGE_SIZE), signal }),
+      apiFetch("/properties", { schema: listingsSchema, query: toApiQuery(key, PAGE_SIZE), signal }),
     placeholderData: keepPreviousData,
-    initialData: initial.data && sameFilters(filters, initial.filters) ? initial.data : undefined,
+    initialData: initial.data && sameFilters(key, queryFilters(initial.filters)) ? initial.data : undefined,
     staleTime: 30_000,
   });
 }
 
-const BEDROOM_CHOICES = [1, 2, 3, 4] as const;
+/** "Places to rent in Kilimani", "Bedsitters to rent": the page's h1 (reference R2 title). */
+export function describeFilters(filters: Filters): string {
+  const what = filters.type ? `${PROPERTY_TYPE_LABEL[filters.type]}s` : "Places";
+  const where = filters.area || filters.county;
+  return `${what} to rent${where ? ` in ${where}` : ""}`;
+}
 
-/** Text input that writes to the URL 400 ms after typing stops (and keeps its own value meanwhile). */
-function DebouncedText({
-  id,
-  value,
-  onCommit,
-  ...props
-}: Omit<React.ComponentProps<"input">, "value" | "onChange"> & {
-  value: string;
-  onCommit: (v: string) => void;
+const boundsOf = (f: Filters): Bounds | null =>
+  f.north !== null && f.south !== null && f.east !== null && f.west !== null
+    ? { north: f.north, south: f.south, east: f.east, west: f.west }
+    : null;
+
+/** R2 filter pill: white, orange outline and text once something is chosen. */
+function Pill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+  children: React.ReactNode;
 }) {
-  const [draft, setDraft] = useState(value);
-  const [synced, setSynced] = useState(value);
-  // The URL changed from elsewhere (clear filters, back button): take the new value.
-  if (value !== synced) {
-    setSynced(value);
-    setDraft(value);
-  }
-  const commit = useDebouncedCallback(onCommit, 400);
   return (
-    <input
-      id={id}
-      value={draft}
-      onChange={(event) => {
-        setDraft(event.target.value);
-        commit(event.target.value);
-      }}
-      className={controlClass}
-      {...props}
-    />
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-pill border px-4 text-step--1 font-medium whitespace-nowrap transition-colors [&_svg]:size-4",
+        active ? "border-accent bg-paper text-accent-text" : "border-line bg-paper text-ink hover:border-line-strong",
+      )}
+    >
+      {children}
+    </button>
   );
 }
 
-function FilterPanel({ filters, set }: { filters: Filters; set: (patch: Partial<Filters>) => void }) {
-  const id = useId();
-  const field = "grid gap-1.5";
-  const label = "font-bold";
+/** R3 view toggle: square icon buttons, the active one solid green. */
+function ViewToggle({ view, onView }: { view: View; onView: (v: View) => void }) {
+  const items: { v: View; label: string; Icon: typeof LayoutGrid }[] = [
+    { v: "map", label: "List and map", Icon: MapIcon },
+    { v: "grid", label: "Grid", Icon: LayoutGrid },
+  ];
   return (
-    <div className="grid gap-5">
-      <div className={field}>
-        <label htmlFor={`${id}-q`} className={label}>
-          Search
-        </label>
-        <DebouncedText
-          id={`${id}-q`}
-          type="search"
-          value={filters.q}
-          onCommit={(q) => set({ q })}
-          placeholder="Title, area or description"
-          enterKeyHint="search"
-          maxLength={100}
-        />
-      </div>
-      <div className={field}>
-        <label htmlFor={`${id}-county`} className={label}>
-          County
-        </label>
-        <NativeSelect
-          id={`${id}-county`}
-          value={filters.county}
-          onChange={(e) => set({ county: e.target.value })}
+    <div role="group" aria-label="View" className="flex gap-1.5">
+      {items.map(({ v, label, Icon }) => (
+        <button
+          key={v}
+          type="button"
+          aria-pressed={view === v}
+          aria-label={label}
+          title={label}
+          onClick={() => onView(v)}
+          className={cn(
+            "grid size-10 place-items-center rounded-md border transition-colors [&_svg]:size-4.5",
+            view === v
+              ? "border-primary bg-primary text-on-primary"
+              : "border-line bg-paper text-ink-2 hover:border-line-strong",
+          )}
         >
-          <option value="">All counties</option>
-          {COUNTIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </NativeSelect>
-      </div>
-      <div className={field}>
-        <label htmlFor={`${id}-area`} className={label}>
-          Area, estate or campus
-        </label>
-        <DebouncedText
-          id={`${id}-area`}
-          value={filters.area}
-          onCommit={(area) => set({ area })}
-          placeholder="e.g. Kilimani"
-          maxLength={150}
-        />
-      </div>
-      <fieldset className="grid gap-2">
-        <legend className={cn(label, "mb-2")}>Type</legend>
-        <div className="flex flex-wrap gap-2">
-          {[null, ...PROPERTY_TYPES].map((t) => {
-            const checked = filters.type === t;
-            return (
-              <label
-                key={t ?? "any"}
-                className={cn(
-                  "inline-flex min-h-11 cursor-pointer items-center rounded-sm border px-3 font-bold transition-colors",
-                  "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus",
-                  checked
-                    ? "border-ink bg-ink text-surface"
-                    : "border-line-strong bg-surface-2 text-ink hover:border-ink",
-                )}
-              >
-                <input
-                  type="radio"
-                  name={`${id}-type`}
-                  className="sr-only"
-                  checked={checked}
-                  onChange={() => set({ type: t as PropertyType | null })}
-                />
-                {t ? PROPERTY_TYPE_LABEL[t] : "Any"}
-              </label>
-            );
-          })}
-        </div>
-      </fieldset>
-      <fieldset className="grid gap-2">
-        <legend className={cn(label, "mb-2")}>Rent a month (KES)</legend>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="grid gap-1">
-            <label htmlFor={`${id}-min`} className="text-step--1 text-ink-2">
-              From
-            </label>
-            <DebouncedText
-              id={`${id}-min`}
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={filters.minPrice === null ? "" : String(filters.minPrice)}
-              onCommit={(v) => set({ minPrice: v.replace(/\D/g, "") ? Number(v.replace(/\D/g, "")) : null })}
-              placeholder="0"
-            />
-          </div>
-          <div className="grid gap-1">
-            <label htmlFor={`${id}-max`} className="text-step--1 text-ink-2">
-              Up to
-            </label>
-            <DebouncedText
-              id={`${id}-max`}
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={filters.maxPrice === null ? "" : String(filters.maxPrice)}
-              onCommit={(v) => set({ maxPrice: v.replace(/\D/g, "") ? Number(v.replace(/\D/g, "")) : null })}
-              placeholder="Any"
-            />
-          </div>
-        </div>
-      </fieldset>
-      <fieldset className="grid gap-2">
-        <legend className={cn(label, "mb-2")}>Bedrooms</legend>
-        <div className="flex flex-wrap gap-2">
-          {[null, ...BEDROOM_CHOICES].map((b) => {
-            const checked = filters.bedrooms === b;
-            return (
-              <label
-                key={b ?? "any"}
-                className={cn(
-                  "inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-sm border px-3 font-bold transition-colors",
-                  "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus",
-                  checked
-                    ? "border-ink bg-ink text-surface"
-                    : "border-line-strong bg-surface-2 text-ink hover:border-ink",
-                )}
-              >
-                <input
-                  type="radio"
-                  name={`${id}-beds`}
-                  className="sr-only"
-                  checked={checked}
-                  onChange={() => set({ bedrooms: b })}
-                />
-                {b === null ? "Any" : b}
-              </label>
-            );
-          })}
-        </div>
-      </fieldset>
-      <label className="flex min-h-11 cursor-pointer items-center gap-3 font-bold">
-        <input
-          type="checkbox"
-          className="size-5 accent-(--ink)"
-          checked={filters.available === true}
-          onChange={(e) => set({ available: e.target.checked ? true : null })}
-        />
-        Available now only
-      </label>
+          <Icon aria-hidden />
+        </button>
+      ))}
     </div>
   );
 }
 
-export function Discovery({
-  initialFilters,
-  initial,
-}: {
-  initialFilters: Filters;
-  initial: Listings | null;
-}) {
+function SortSelect({ sort, onSort }: { sort: Sort; onSort: (s: Sort) => void }) {
+  return (
+    <label className="flex min-h-10 items-center gap-1 rounded-md border border-line bg-paper pl-3 text-step--2 text-ink-3">
+      Sort by:
+      <select
+        aria-label="Sort by"
+        value={sort}
+        onChange={(e) => onSort(e.target.value as Sort)}
+        className="min-h-10 cursor-pointer appearance-none rounded-md bg-transparent bg-[url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f2427' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;)] bg-[length:0.8rem] bg-[right_0.6rem_center] bg-no-repeat pr-8 pl-0.5 font-semibold text-ink outline-none focus-visible:outline-2 focus-visible:outline-focus"
+      >
+        {SORTS.map((s) => (
+          <option key={s} value={s}>
+            {SORT_LABEL[s]}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+export function Discovery({ initialFilters, initial }: { initialFilters: Filters; initial: Listings | null }) {
   const [raw, setRaw] = useQueryStates(filterParsers, { history: "push", scroll: false });
   const filters = normaliseFilters(raw);
   const query = useDiscoveryQuery(filters, { filters: initialFilters, data: initial });
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  // The pill that opened the sheet gets focus back when it closes.
+  const opener = useRef<HTMLElement | null>(null);
+  const openSheet = (event: React.MouseEvent<HTMLElement>) => {
+    opener.current = event.currentTarget;
+    setSheetOpen(true);
+  };
+  const [phoneMap, setPhoneMap] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [searchAsMove, setSearchAsMove] = useState(boundsOf(filters) !== null);
 
   const set = (patch: Partial<Filters>) =>
     void setRaw({ ...patch, page: "page" in patch ? (patch.page ?? null) : null });
-  const clearAll = () => void setRaw({ ...EMPTY_FILTERS, sort: filters.sort, page: null });
+  const reset = () =>
+    void setRaw({ ...EMPTY_FILTERS, sort: filters.sort, view: filters.view, page: null });
 
   const total = query.data?.meta?.total ?? 0;
   const totalPages = query.data?.meta?.totalPages ?? 1;
   const active = activeFilterCount(filters);
   const listings = query.data?.data ?? [];
   const refreshing = query.isFetching && query.isPlaceholderData;
+  const view = filters.view;
+  const countText = query.data ? `${formatAmount(total)} ${total === 1 ? "listing" : "listings"}` : "Loading places";
 
   const goToPage = (page: number) => {
     set({ page });
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    listRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    listRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
   };
 
-  const countText = query.data ? plural(total, "place") : "Loading places";
+  const map = (
+    <ListingMap
+      listings={listings}
+      selectedId={selectedId}
+      highlightId={hoveredId}
+      onSelect={setSelectedId}
+      bounds={boundsOf(filters)}
+      searchAsMove={searchAsMove}
+      onSearchAsMove={(on) => {
+        setSearchAsMove(on);
+        if (!on) set({ north: null, south: null, east: null, west: null });
+      }}
+      onBounds={(b) => void setRaw({ ...b, page: null }, { history: "replace" })}
+      className="size-full"
+    />
+  );
+
+  const results = query.isPending ? (
+    <div className="grid gap-3">
+      <WakingNotice />
+      <ul aria-hidden className={cn("grid gap-3", view === "grid" && "gap-4 sm:grid-cols-2 xl:grid-cols-3")}>
+        {Array.from({ length: 4 }, (_, i) => (
+          <li key={i}>{view === "grid" ? <PropertyPlateSkeleton /> : <ListingRowSkeleton />}</li>
+        ))}
+      </ul>
+    </div>
+  ) : query.isError && !query.data ? (
+    <StateBlock
+      icon={AlertTriangle}
+      tone="warning"
+      title="Places didn't load"
+      action={
+        <Button onClick={() => void query.refetch()} loading={query.isFetching}>
+          <RotateCcw aria-hidden />
+          Try again
+        </Button>
+      }
+    >
+      <p>{messageFor(query.error)}</p>
+    </StateBlock>
+  ) : listings.length === 0 ? (
+    <StateBlock
+      icon={SearchX}
+      title={active > 0 ? "No places match these filters" : "No places listed yet"}
+      action={
+        active > 0 ? (
+          <Button variant="primary" onClick={reset}>
+            Reset filters
+          </Button>
+        ) : undefined
+      }
+    >
+      <p>
+        {active > 0
+          ? "Try a wider budget, a nearby area or any type. New places come in all the time."
+          : "KejaLink is new and the first places are on their way. Check back soon."}
+      </p>
+    </StateBlock>
+  ) : (
+    <>
+      {refreshing ? <WakingNotice /> : null}
+      <ul
+        aria-busy={refreshing}
+        className={cn(
+          "grid transition-opacity duration-(--dur-2)",
+          view === "grid" ? "gap-4 sm:grid-cols-2 xl:grid-cols-3" : "gap-2.5",
+          refreshing && "opacity-60",
+        )}
+      >
+        {listings.map((property, index) => (
+          <li key={property.id} className="grid">
+            {view === "grid" ? (
+              <PropertyPlate
+                property={property}
+                priority={index < 3 && filters.page === 1}
+                headingLevel="h2"
+              />
+            ) : (
+              <ListingRow
+                property={property}
+                priority={index < 2 && filters.page === 1}
+                selected={property.id === selectedId}
+                onHover={setHoveredId}
+              />
+            )}
+          </li>
+        ))}
+      </ul>
+      <Pagination page={filters.page} totalPages={totalPages} onPage={goToPage} disabled={query.isFetching} />
+    </>
+  );
+
+  const header = (
+    <div className="grid gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+        <div className="grid gap-0.5">
+          <h1 className="headline text-step-2 md:text-step-3">{describeFilters(filters)}</h1>
+          <p role="status" aria-live="polite" className="text-step--2 text-ink-3">
+            {countText}
+            {filters.q ? <> matching &ldquo;{filters.q}&rdquo;</> : null}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <SortSelect sort={filters.sort} onSort={(sort) => set({ sort })} />
+          <div className="hidden lg:block">
+            <ViewToggle view={view} onView={(v) => void setRaw({ view: v })} />
+          </div>
+        </div>
+      </div>
+
+      {/* Phones and tablets: R2 filter pills; each opens the full filter sheet. */}
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:hidden [scrollbar-width:none]">
+        <Pill active={active > 0} onClick={openSheet}>
+          <SlidersHorizontal aria-hidden />
+          Filters{active > 0 ? ` (${active})` : ""}
+        </Pill>
+        <Pill active={filters.type !== null} onClick={openSheet}>
+          {filters.type ? PROPERTY_TYPE_LABEL[filters.type] : "Type"}
+        </Pill>
+        <Pill active={filters.minPrice !== null || filters.maxPrice !== null} onClick={openSheet}>
+          {filters.maxPrice !== null ? `Up to KES ${formatAmount(filters.maxPrice)}` : "Price"}
+        </Pill>
+        <Pill active={filters.bedrooms !== null} onClick={openSheet}>
+          {filters.bedrooms !== null ? `${filters.bedrooms}+ bedrooms` : "Bedrooms"}
+        </Pill>
+        <Pill active={filters.amenities.length > 0} onClick={openSheet}>
+          {filters.amenities.length > 0 ? plural(filters.amenities.length, "convenience") : "More filters"}
+        </Pill>
+      </div>
+    </div>
+  );
+
+  const filterColumn = (
+    <aside
+      aria-labelledby="filters-title"
+      className="hidden border-r border-line bg-paper lg:block lg:overflow-y-auto"
+    >
+      <div className="grid gap-5 p-6">
+        <div className="flex items-center justify-between">
+          <h2 id="filters-title" className="text-step-0 font-bold">
+            Filters
+          </h2>
+          {active > 0 ? (
+            <button type="button" onClick={reset} className="link text-step--2">
+              Reset filters
+            </button>
+          ) : null}
+        </div>
+        <FilterPanel filters={filters} set={set} />
+      </div>
+    </aside>
+  );
+
+  const sheet = (
+    <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
+      <DialogContent
+        variant="sheet"
+        title="Filters"
+        description={countText}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          opener.current?.focus();
+        }}
+      >
+        <FilterPanel filters={filters} set={set} />
+        <div className="sticky bottom-0 -mx-5 mt-6 flex gap-3 border-t border-line bg-paper px-5 pt-4">
+          {active > 0 ? (
+            <Button variant="ghost" onClick={reset}>
+              Reset
+            </Button>
+          ) : null}
+          <Button variant="primary" block onClick={() => setSheetOpen(false)}>
+            {query.data ? `Show ${plural(total, "place")}` : "Show places"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  if (view === "grid") {
+    return (
+      <div className="grid flex-1 lg:grid-cols-[17.5rem_1fr]">
+        {filterColumn}
+        <section ref={listRef} aria-label="Results" className="grid min-w-0 scroll-mt-20 content-start gap-5 p-4 md:p-6">
+          {header}
+          {results}
+        </section>
+        {sheet}
+      </div>
+    );
+  }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[17.5rem_1fr] lg:gap-10">
-      <aside aria-labelledby="filters-title" className="hidden lg:block">
-        <div className="sticky top-[calc(var(--header-h)+1.5rem)] grid gap-5">
-          <div className="flex items-center justify-between">
-            <h2 id="filters-title" className="board-type text-step-2">
-              Filters
-            </h2>
-            {active > 0 ? (
-              <Button variant="ghost" size="sm" onClick={clearAll}>
-                Clear all
-              </Button>
-            ) : null}
-          </div>
-          <FilterPanel filters={filters} set={set} />
-        </div>
-      </aside>
-
-      <div ref={resultsRef} className="grid min-w-0 scroll-mt-24 content-start gap-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p role="status" aria-live="polite" className="font-bold">
-            {countText}
-            {filters.maxPrice !== null ? (
-              <span className="font-normal text-ink-2"> · up to KES {formatAmount(filters.maxPrice)}</span>
-            ) : null}
-          </p>
-          <div className="flex items-center gap-2">
-            <label htmlFor="sort" className="text-step--1 text-ink-2">
-              Sort
-            </label>
-            <NativeSelect
-              id="sort"
-              value={filters.sort}
-              onChange={(e) => set({ sort: e.target.value as Sort })}
-              className="w-auto min-w-44"
-            >
-              {SORTS.map((s) => (
-                <option key={s} value={s}>
-                  {SORT_LABEL[s]}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-        </div>
-
-        {query.isPending ? (
-          <div className="grid gap-4">
-            <WakingNotice />
-            <ul aria-hidden className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {Array.from({ length: 6 }, (_, i) => (
-                <li key={i}>
-                  <PropertyPlateSkeleton />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : query.isError && !query.data ? (
-          <StateBlock
-            icon={AlertTriangle}
-            tone="warning"
-            title="Places didn't load"
-            action={
-              <Button onClick={() => void query.refetch()} loading={query.isFetching}>
-                <RotateCcw aria-hidden />
-                Try again
-              </Button>
-            }
-          >
-            <p>{messageFor(query.error)}</p>
-          </StateBlock>
-        ) : listings.length === 0 ? (
-          <StateBlock
-            icon={SearchX}
-            title={active > 0 ? "No places match these filters" : "No places listed yet"}
-            action={
-              active > 0 ? (
-                <Button variant="board" onClick={clearAll}>
-                  Clear all filters
-                </Button>
-              ) : undefined
-            }
-          >
-            <p>
-              {active > 0
-                ? "Try a wider budget, a nearby area, or any type. New places come in all the time."
-                : "KejaLink is new and the first places are on their way. Check back soon."}
-            </p>
-          </StateBlock>
-        ) : (
-          <>
-            {refreshing ? <WakingNotice /> : null}
-            <ul
-              aria-busy={refreshing}
-              className={cn(
-                "grid gap-5 transition-opacity duration-(--dur-2) sm:grid-cols-2 xl:grid-cols-3",
-                refreshing && "opacity-60",
-              )}
-            >
-              {listings.map((property, index) => (
-                <li key={property.id} className="grid">
-                  <PropertyPlate
-                    property={property}
-                    index={index}
-                    priority={index < 2 && filters.page === 1}
-                    headingLevel="h2"
-                  />
-                </li>
-              ))}
-            </ul>
-            <Pagination
-              page={filters.page}
-              totalPages={totalPages}
-              onPage={goToPage}
-              disabled={query.isFetching}
-            />
-          </>
+    <div className="grid flex-1 lg:h-[calc(100dvh-var(--header-h))] lg:flex-none lg:grid-cols-[17.5rem_1fr] lg:grid-rows-[minmax(0,1fr)] xl:grid-cols-[18.75rem_minmax(26rem,32rem)_1fr]">
+      {filterColumn}
+      <section
+        ref={listRef}
+        aria-label="Results"
+        className={cn(
+          "grid min-w-0 scroll-mt-20 content-start gap-4 p-4 md:p-6 lg:overflow-y-auto xl:px-5",
+          phoneMap && "max-xl:hidden",
         )}
+      >
+        {header}
+        {results}
+      </section>
+      <div
+        className={cn(
+          "xl:block",
+          phoneMap ? "h-[calc(100dvh-var(--header-h))] lg:h-auto" : "hidden",
+        )}
+      >
+        {map}
       </div>
 
-      {/* Phones: filters live in a bottom sheet, opened from a bar in thumb reach. */}
-      <div className="sticky bottom-0 z-30 -mx-(--gutter) border-t border-line bg-surface/95 px-(--gutter) py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-        <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
-          <DialogTrigger asChild>
-            <Button variant="board" block size="lg">
-              <SlidersHorizontal aria-hidden />
-              Filters{active > 0 ? ` (${active})` : ""}
-            </Button>
-          </DialogTrigger>
-          <DialogContent variant="sheet" title="Filters" description={countText}>
-            <FilterPanel filters={filters} set={set} />
-            <div className="sticky bottom-0 -mx-5 mt-6 flex gap-3 border-t border-line bg-surface-2 px-5 pt-4">
-              {active > 0 ? (
-                <Button variant="ghost" onClick={clearAll}>
-                  Clear all
-                </Button>
-              ) : null}
-              <Button variant="band" block onClick={() => setSheetOpen(false)}>
-                {query.data ? `Show ${plural(total, "place")}` : "Show places"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+      {/* Below 1280px the map replaces the list; one floating switch toggles them. */}
+      <div className="pointer-events-none sticky bottom-4 z-30 flex justify-center pb-[env(safe-area-inset-bottom)] lg:fixed lg:inset-x-0 xl:hidden">
+        <Button
+          variant="primary"
+          className="pointer-events-auto rounded-pill px-5 shadow-2"
+          onClick={() => setPhoneMap((v) => !v)}
+        >
+          {phoneMap ? <List aria-hidden /> : <MapIcon aria-hidden />}
+          {phoneMap ? "Show list" : "Show map"}
+        </Button>
       </div>
+      {sheet}
     </div>
   );
 }
